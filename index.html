@@ -233,6 +233,17 @@ canvas{display:block}
 .gpill.gpulse{animation:gpulse .32s ease}
 @keyframes gpulse{0%{transform:scale(1)}40%{transform:scale(1.22)}100%{transform:scale(1)}}
 #muteBtn{position:fixed;bottom:16px;right:16px;z-index:31;width:44px;height:44px;border-radius:50%;background:rgba(8,16,42,.85);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:1.15rem;cursor:pointer}
+/* ===== FIX · JUGAR siempre completo, centrado y visible (2026-10-11) =====
+   La columna del menú es flex: cuando el contenido es más alto que la
+   pantalla, los hijos se encogían y el botón JUGAR (overflow:hidden)
+   quedaba aplastado con el texto cortado. Ahora ningún hijo del menú
+   se encoge: si no cabe, el menú hace scroll como ya estaba previsto. */
+#menuInner>*{flex-shrink:0}
+#btnJugar{flex:0 0 auto;align-self:center}
+/* Sin barra visible dentro del menú: con barra clásica (PC) el contenido
+   centrado se corría ~8px a la izquierda; en el celular ya era invisible. */
+#menuInner{scrollbar-width:none}
+#menuInner::-webkit-scrollbar{width:0;height:0}
 </style>
 <div id="wrap"><canvas id="cv"></canvas></div>
 
