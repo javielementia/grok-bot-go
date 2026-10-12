@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>GROK BOT GO — Más que un juego, es una aventura</title>
+<!-- BORRADOR DIA 5 (2026-10-12): Cuenta regresiva tranquila 3-2-1 al volver de la pausa y al revivir. NO PUBLICADO: espera el si explicito de Javier. Base: grok-bot-go-profesional.html (la version profesional aprobada y publicada el 2026-10-11). Sin cambios de diseno, sin personajes nuevos: solo pulido dentro del diseno del mockup. -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#0b1026;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
@@ -244,6 +245,13 @@ canvas{display:block}
    centrado se corría ~8px a la izquierda; en el celular ya era invisible. */
 #menuInner{scrollbar-width:none}
 #menuInner::-webkit-scrollbar{width:0;height:0}
+/* ===== BORRADOR DIA 5 · CUENTA REGRESIVA TRANQUILA =====
+   Al volver de la pausa o al revivir, el juego ya no arranca de golpe:
+   cuenta 3 · 2 · 1 · ¡YA! con numeros grandes dorados (mismos colores
+   del juego) y el botsito quieto, para prepararse sin susto. */
+#countdown{position:fixed;inset:0;z-index:35;display:flex;align-items:center;justify-content:center;pointer-events:none}
+#cdNum{font-size:clamp(5rem,26vw,9rem);font-weight:900;color:#ffd21f;text-shadow:0 4px 0 rgba(0,0,0,.35),0 10px 34px rgba(0,0,0,.65),0 0 44px rgba(255,210,31,.45);animation:cdPop .62s cubic-bezier(.18,.9,.26,1.28)}
+@keyframes cdPop{0%{transform:scale(1.65);opacity:0}55%{transform:scale(.96);opacity:1}100%{transform:scale(1);opacity:1}}
 </style>
 <div id="wrap"><canvas id="cv"></canvas></div>
 
@@ -265,6 +273,7 @@ canvas{display:block}
   <div id="gHint">◀ ▶ cambia de carril · ▲ salta · ▼ rueda</div>
 </div>
 <div id="lvlup"></div>
+<div id="countdown" class="hidden"><span id="cdNum">3</span></div>
 
 <!-- Quiz cerebro -->
 <div id="quiz" class="screen off">
@@ -896,10 +905,28 @@ $('quitBtn').addEventListener('click',function(){ running=false; $('gameHud').cl
 $('introSkip').addEventListener('click',function(){ introOn=false; $('introChase').classList.add('off'); spawnT=30; nextQuiz=dist+300; SFX.click(); });
 /* ============ PAUSA ============ */
 function togglePause(){
-  if(!running||quizOn||reviveOpen) return;
+  if(!running||quizOn||reviveOpen||counting) return;
   paused=!paused;
   if(paused){ $('paused').classList.remove('off'); SFX.click(); }
-  else{ $('paused').classList.add('off'); lastTs=performance.now(); requestAnimationFrame(loop); SFX.click(); }
+  else{ $('paused').classList.add('off'); SFX.click(); runCountdown(function(){ paused=false; lastTs=performance.now(); requestAnimationFrame(loop); }); }
+}
+/* ===== BORRADOR DIA 5 · CUENTA REGRESIVA TRANQUILA =====
+   El juego queda CONGELADO mientras cuenta (el bucle no corre):
+   muestra 3, 2, 1 con un pitido suave y un ¡YA! alegre al final.
+   Sirve al volver de la pausa y al revivir con llave. */
+var counting=false;
+function runCountdown(done){
+  if(counting){ if(done) done(); return; }
+  counting=true;
+  var steps=['3','2','1','¡YA!'], i=0, cd=$('countdown'), num=$('cdNum');
+  cd.classList.remove('hidden');
+  (function step(){
+    if(i>=steps.length){ cd.classList.add('hidden'); counting=false; if(done) done(); return; }
+    num.textContent=steps[i];
+    num.style.animation='none'; void num.offsetWidth; num.style.animation='';
+    if(i<3) tone(520,.12,'triangle'); else SFX.level();
+    i++; setTimeout(step, i<=3?680:430);
+  })();
 }
 $('pauseBtn').addEventListener('click',togglePause);
 $('resumeBtn').addEventListener('click',togglePause);
@@ -971,7 +998,7 @@ function doReviveYes(){
   lives=maxLives; invT=150; hurt=30; shield=false; reviveOpen=false;
   $('revive').classList.add('off');
   showLvl('💚 ¡De vuelta al juego!'); SFX.level(); updateHud();
-  lastTs=performance.now(); requestAnimationFrame(loop);
+  runCountdown(function(){ lastTs=performance.now(); requestAnimationFrame(loop); }); /* DIA 5: vuelve tranquilo, sin arranque de golpe */
 }
 function doReviveNo(){ reviveOpen=false; $('revive').classList.add('off'); finishGame(); }
 $('reviveYes').addEventListener('click',doReviveYes);
@@ -1052,7 +1079,7 @@ $('qB').addEventListener('click',function(){ answerQuiz(1); });
 var tSX=0,tSY=0;
 cv.addEventListener('touchstart',function(e){ var t=e.changedTouches[0]; tSX=t.clientX; tSY=t.clientY; },{passive:true});
 cv.addEventListener('touchend',function(e){
-  if(!running||paused||quizOn) return;
+  if(!running||paused||quizOn||counting) return;
   var t=e.changedTouches[0],dx=t.clientX-tSX,dy=t.clientY-tSY;
   if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>24){ lane=clamp(lane+(dx>0?1:-1),0,2); SFX.click(); }
   else if(dy<-24){ doJump(); }
@@ -1066,7 +1093,7 @@ function doRoll(){ if(!rolling&&!jumping){ rolling=true; rollT=42; SFX.click(); 
 /* SECCIÓN 3: la hoverboard se activa con DOBLE TOQUE */
 var lastTapT=0,lastDownT=0;
 function activateBoard(){
-  if(!running||paused||quizOn||reviveOpen||shield) return;
+  if(!running||paused||quizOn||reviveOpen||counting||shield) return;
   if(boardInv<=0) return;
   boardInv--; shield=true; spinT=24; pickFlash=6;
   burst(px,py-40,'#67ca86'); burst(px,py-40,'#ffffff'); ring(px,py-40,'#67ca86');
@@ -1074,7 +1101,7 @@ function activateBoard(){
   showLvl('🛹 ¡A rodar con estilo!'); SFX.boardAct(); updateHud();
 }
 document.addEventListener('keydown',function(e){
-  if(!running||paused||quizOn) return;
+  if(!running||paused||quizOn||counting) return;
   if(e.key==='ArrowLeft'&&lane>0){ lane--; }
   else if(e.key==='ArrowRight'&&lane<2){ lane++; }
   else if(e.key==='ArrowUp'){ doJump(); }
