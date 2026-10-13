@@ -354,7 +354,7 @@ canvas{display:block}
       <span>🪙 <b id="shopCoins">0</b></span><span>⭐ <b id="shopStars">0</b></span><span>🔑 <b id="shopKeys">0</b></span><span>💎 <b id="shopGems">0</b></span>
     </div>
     <div id="shopList"></div>
-    <div class="scrSub" style="margin-top:8px">La tienda completa abre muy pronto 🔜</div>
+    <div class="scrSub" style="margin-top:8px">¡La tienda está completa! 🎉</div>
     <button class="btn" id="shopClose">Cerrar</button>
   </div>
 </div>
@@ -587,12 +587,24 @@ function renderShop(){
     var pips='●'.repeat(lv)+'○'.repeat(5-lv);
     row('<div>'+u.name+'<small>'+pips+' · Dura '+upgSecs(k)+'s ('+u.secs+'/nivel)</small></div><span>'+(maxed?'🏆 MÁX':'🪙 '+upgCost(k))+'</span>',function(){ buyUpg(k); });
   });
-  h('🔜 PRÓXIMAMENTE');
-  [['🔑','Llave mágica','Revive una vez al chocar'],['👤','Botsitos','Desbloquea nuevos robots']].forEach(function(it){
-    row('<div>'+it[0]+' '+it[1]+'<small>'+it[2]+'</small></div><span>🔜</span>',function(){ toast('🔜 Muy pronto en la tienda'); SFX.no(); });
-  });
+  h('🔑 LLAVES MÁGICAS');
+  row('<div>🔑 Llave mágica<small>Revive una vez al chocar</small></div><span>🪙 300</span>',function(){ buyKey(); });
+  h('👤 BOTSITOS');
+  row('<div>👤 Desbloquea robots<small>Se compran en Personajes</small></div><span>▶ Ir</span>',function(){ $('mTienda').classList.add('off'); show('personajes'); SFX.click(); });
 }
-$('btnAmigos').addEventListener('click',function(){ toast('👥 Invita a tus amigos pronto 🔜'); SFX.click(); });
+function buyKey(){
+  var cost=300;
+  if(state.coins<cost){ toast('Te faltan 🪙 '+(cost-state.coins)+' para la llave'); SFX.no(); return; }
+  state.coins-=cost; store('gbg_coins',String(state.coins));
+  state.keys+=1; store('gbg_keys',String(state.keys));
+  toast('🎉 ¡Llave mágica comprada! 🔑'); SFX.level(); renderShop();
+}
+$('btnAmigos').addEventListener('click',function(){
+  var msg='🤖 ¡Juega BOTSITOS GO! 🎮 Lo creé yo. Toca el link y juega, no pide cuenta ni contraseña. ¡Dime cuántos puntos haces! 🏆';
+  if(navigator.share){ navigator.share({title:'BOTSITOS GO',text:msg,url:GAME_URL}).catch(function(){}); }
+  else { window.open('https://wa.me/?text='+encodeURIComponent(msg+' '+GAME_URL),'_blank'); }
+  SFX.click();
+});
 /* ============ PERSONAJES / MUNDOS ============ */
 function renderChars(){
   var w=$('charCards'); w.innerHTML='';
