@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GROK BOT GO — Más que un juego, es una aventura</title>
+<title>BOTSITOS GO — Más que un juego, es una aventura</title>
 <!-- BORRADOR DIA 5 (2026-10-12): Cuenta regresiva tranquila 3-2-1 al volver de la pausa y al revivir. NO PUBLICADO: espera el si explicito de Javier. Base: grok-bot-go-profesional.html (la version profesional aprobada y publicada el 2026-10-11). Sin cambios de diseno, sin personajes nuevos: solo pulido dentro del diseno del mockup. -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -152,7 +152,7 @@ h1.gtitle .w1{color:#38a8ed}h1.gtitle .w2{color:#ffb020}h1.gtitle .w3{color:#74b
     <div class="setrow"><span>🌱 Arranque suavecito</span><div class="tgl on" id="tglSoft"></div></div>
     <div class="setrow"><span>📳 Vibración</span><div class="tgl on" id="tglVib"></div></div>
     <div class="setrow"><span>🏆 Ver mi récord</span><button class="backbtn" id="btnVerRecord" style="margin:0">Ver</button></div>
-    <div class="scrSub" style="margin-top:14px">GROK BOT GO v2.0 · Hecho con ❤️ para la familia</div>
+    <div class="scrSub" style="margin-top:14px">BOTSITOS GO v2.0 · Hecho con ❤️ para la familia</div>
   </div>
 </div>
 <style>
@@ -209,7 +209,7 @@ canvas{display:block}
 #loader{background:#0b1026;z-index:70}
 .spin{font-size:2.6rem;animation:spin 1.2s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* ===== JUICE PACK 1 · Trimestre 1 del AÑO GROK BOT GO ===== */
+/* ===== JUICE PACK 1 · Trimestre 1 del AÑO BOTSITOS GO ===== */
 #btnJugar{position:relative;overflow:hidden;animation:btnGlow 2.4s ease-in-out infinite}
 #btnJugar::after{content:'';position:absolute;top:-25%;bottom:-25%;left:-45%;width:34%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:btnShine 2.8s ease-in-out infinite;pointer-events:none}
 @keyframes btnShine{0%{left:-45%}55%{left:118%}100%{left:118%}}
@@ -686,7 +686,7 @@ var introOn=false,introT=0,introMsgDone=false,invT=0,reviveOpen=false;
 var lastScore=0,lastRecord=false,nextQuiz=300,lastQ=-1,qAnswered=false,qCorrect=0;
 var bgScroll=0,dashOff=0,lastTs=0,lvlTO=null;
 var GENIUS_TIME=480;
-/* ============ JUICE PACK 1 · Trimestre 1 del AÑO GROK BOT GO ============ */
+/* ============ JUICE PACK 1 · Trimestre 1 del AÑO BOTSITOS GO ============ */
 var ssx=1,ssy=1,ssTX=1,ssTY=1,airFrames=0,landT=0; /* squash & stretch del jugador */
 var leanA=0,lastLane=1;                            /* inclinación al cambiar de carril */
 var shakeT=0,pickFlash=0;                          /* shake sutil al chocar · flash blanco al recoger */
@@ -934,9 +934,9 @@ document.addEventListener('visibilitychange',function(){ if(document.hidden&&run
 /* ============ COMPARTIR ============ */
 var GAME_URL='https://javielementia.github.io/grok-bot-go/';
 function shareScore(){
-  var msg=(lastRecord&&lastScore>0?'🤖 ¡NUEVO RÉCORD en GROK BOT GO! Hice '+lastScore+' puntos 🎉 ':'🤖 Hice '+lastScore+' puntos en GROK BOT GO. ')+'¿Me superas? Juega gratis aquí: '+GAME_URL;
+  var msg=(lastRecord&&lastScore>0?'🤖 ¡NUEVO RÉCORD en BOTSITOS GO! Hice '+lastScore+' puntos 🎉 ':'🤖 Hice '+lastScore+' puntos en BOTSITOS GO. ')+'¿Me superas? Juega gratis aquí: '+GAME_URL;
   SFX.click();
-  if(navigator.share){ navigator.share({title:'GROK BOT GO',text:msg,url:GAME_URL}).catch(function(){}); }
+  if(navigator.share){ navigator.share({title:'BOTSITOS GO',text:msg,url:GAME_URL}).catch(function(){}); }
   else{ window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank'); }
 }
 $('shareBtn').addEventListener('click',shareScore);
