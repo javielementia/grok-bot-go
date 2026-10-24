@@ -421,7 +421,9 @@ function tone(f,d,type,vol){ if(state.muted) return; try{
   o.type=type||'triangle'; o.frequency.value=f;
   g.gain.setValueAtTime(vol||0.12, actx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+d);
-  o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);
+  o.connect(g); g.connect(actx.destination);
+  o.onended=function(){ try{ o.disconnect(); g.disconnect(); }catch(e){} }; /* RONDA 2 ANTI-CIERRE: sin esto, cada sonido dejaba 2 nodos conectados PARA SIEMPRE en el grafo de audio; a los ~90 s de buena partida se juntaban ~1,600 y Safari cerraba la página */
+  o.start(); o.stop(actx.currentTime+d);
 }catch(e){} }
 var SFX = {
   click:function(){ tone(600,.07,'triangle'); },
@@ -702,7 +704,7 @@ var W=0,H=0,DPR=1;
 function laneX(){ var m=W*0.18; lanePX=[m,W/2,W-m]; }
 var isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent||''); /* MANTENIMIENTO: iPhone se protege cerrando páginas pesadas */
 var QLVL=2, slowFrames=0; /* 2=alta 1=media 0=liviana */
-function resize(){ DPR=Math.min(isIOS?1.5:2,window.devicePixelRatio||1); W=Math.min(window.innerWidth,520); H=window.innerHeight; cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); laneX(); }
+function resize(){ DPR=Math.min(isIOS?1.25:2,window.devicePixelRatio||1) /* RONDA 2: iOS a 1.25 = ~31% menos píxeles que llenar por cuadro */; W=Math.min(window.innerWidth,520); H=window.innerHeight; cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); laneX(); }
 /* MANTENIMIENTO: si el teléfono va lento muchos cuadros seguidos, bajo la calidad solo para que no se cierre */
 function adaptQuality(dtms){
   if(dtms>26){ slowFrames++; } else if(slowFrames>0){ slowFrames--; }
@@ -743,7 +745,9 @@ function sweep(f0,f1,d,type,vol){ if(state.muted) return; try{
   o.frequency.linearRampToValueAtTime(f1,actx.currentTime+d);
   g.gain.setValueAtTime(vol||0.12,actx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+d);
-  o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);
+  o.connect(g); g.connect(actx.destination);
+  o.onended=function(){ try{ o.disconnect(); g.disconnect(); }catch(e){} }; /* RONDA 2 ANTI-CIERRE: liberar los nodos al terminar, igual que en tone() */
+  o.start(); o.stop(actx.currentTime+d);
 }catch(e){} }
 /* ============ SECCIÓN 4 · ECONOMÍA Y PROGRESIÓN ============ */
 var permMult=parseInt(read('gbg_permMult','1'),10)||1; if(permMult<1)permMult=1; if(permMult>30)permMult=30;
@@ -1046,7 +1050,7 @@ function doReviveNo(){ reviveOpen=false; $('revive').classList.add('off'); finis
 $('reviveYes').addEventListener('click',doReviveYes);
 $('reviveNo').addEventListener('click',doReviveNo);
 var PQ=(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4)?0.5:1; /* ART: gama baja = mitad de partículas */
-function burst(x,y,c){ var n=Math.max(4,Math.round(10*PQ)); for(var i=0;i<n;i++) safeSetPart(x,y,(Math.random()-0.5)*6,(Math.random()-0.5)*6-2,30,30,c,0,1,0,0,true); } /* ULTRA: chispas con brillo */
+function burst(x,y,c){ var n=Math.max(4,Math.round(10*PQ*(isIOS?0.55:1))); /* RONDA 2 iOS: festejos (aplauso 500 m, nivel, patito) con ~mitad de chispas: el festejo se ve, el pico de costo no */ for(var i=0;i<n;i++) safeSetPart(x,y,(Math.random()-0.5)*6,(Math.random()-0.5)*6-2,30,30,c,0,1,0,0,true); } /* ULTRA: chispas con brillo */
 /* ---- JUICE PACK 1: polvo, estelas, popups flotantes, pulso y tween del HUD ---- */
 function dust(x,y){ var n=Math.max(3,Math.round(8*PQ)); for(var i=0;i<n;i++) safeSetPart(x+(Math.random()-0.5)*40,y-4,(Math.random()-0.5)*3.2,-0.4-Math.random()*1.4,16+Math.random()*10,26,'#d8cdb8',3+Math.random()*3,0.55); }
 function trail(x,y,c){ safeSetPart(x+(Math.random()-0.5)*8,y,(Math.random()-0.5)*1.4,1+Math.random()*1.6,22,22,c,4+Math.random()*3,0.5,0,0,true); } /* ULTRA: estela brillante */
@@ -1063,7 +1067,7 @@ function newEnt(kind,lane,y){ var e=entFree.pop();
   else e={kind:kind,lane:lane,y:y,got:false,ph:Math.random()*6.28,ci:0,ch:null,li:-1,mx:undefined,mtg:0};
   return e; }
 function delEnt(i){ if(entFree.length<160) entFree.push(ents[i]); ents.splice(i,1); }
-function newPart(){ if(parts.length>380) return null; var p=partFree.pop(); if(!p) p={}; return p; } /* MANTENIMIENTO: tope de partículas */
+function newPart(){ if(parts.length>(isIOS?260:380)) return null; /* RONDA 2: en iOS el tope baja a 260 */ var p=partFree.pop(); if(!p) p={}; return p; } /* MANTENIMIENTO: tope de partículas */
 function safeSetPart(x,y,vx,vy,life,max,c,r,a,ring,vr,glow){ var p=newPart(); if(!p) return; parts.push(setPart(p,x,y,vx,vy,life,max,c,r,a,ring,vr,glow)); }
 function setPart(p,x,y,vx,vy,life,max,c,r,a,ring,vr,glow){ p.x=x;p.y=y;p.vx=vx;p.vy=vy;p.life=life;p.max=max;p.c=c;p.r=r||0;p.a=(a===undefined?1:a);p.ring=!!ring;p.vr=vr||0;p.glow=!!glow; return p; }
 function delPart(j){ if(partFree.length<500) partFree.push(parts[j]); parts.splice(j,1); }
@@ -1681,7 +1685,7 @@ function draw(dt){
     if(p.ring){ ctx.strokeStyle=p.c; ctx.lineWidth=4; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.stroke(); }
     else { ctx.fillStyle=p.c;
       /* ULTRA: brillo de estudio en las chispas redondas */
-      if(p.glow&&QLVL>1){ ctx.shadowColor=p.c; ctx.shadowBlur=12; } /* MANTENIMIENTO + DÍA 21 ANTI-CIERRE: el brillo (shadowBlur, lo más caro en iPhone) solo en calidad ALTA; en media las chispas se dibujan igual pero sin sombra, para que la página no se cierre en las buenas rachas */
+      if(p.glow&&QLVL>1&&!isIOS){ ctx.shadowColor=p.c; ctx.shadowBlur=12; } /* RONDA 2: en iOS el brillo va APAGADO SIEMPRE (no solo al bajar calidad): shadowBlur es la operación más cara de Safari y en las buenas rachas se dibujaban decenas por cuadro */ /* MANTENIMIENTO + DÍA 21 ANTI-CIERRE: el brillo (shadowBlur, lo más caro en iPhone) solo en calidad ALTA; en media las chispas se dibujan igual pero sin sombra, para que la página no se cierre en las buenas rachas */
       if(p.r){ ctx.beginPath(); ctx.arc(p.x,p.y,p.r*(0.6+0.4*p.life/pm),0,7); ctx.fill(); }
       else ctx.fillRect(p.x-2,p.y-2,4,4);
       ctx.shadowBlur=0; } }
