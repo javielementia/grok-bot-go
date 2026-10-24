@@ -706,7 +706,7 @@ function resize(){ DPR=Math.min(isIOS?1.5:2,window.devicePixelRatio||1); W=Math.
 /* MANTENIMIENTO: si el teléfono va lento muchos cuadros seguidos, bajo la calidad solo para que no se cierre */
 function adaptQuality(dtms){
   if(dtms>26){ slowFrames++; } else if(slowFrames>0){ slowFrames--; }
-  if(slowFrames>90&&QLVL>0){ QLVL--; slowFrames=0; if(QLVL===1){ PQ=Math.min(PQ,0.6); } if(QLVL===0){ PQ=0.3; DPR=1; try{resize();}catch(e){} } }
+  if(slowFrames>40&&QLVL>0){ QLVL--; slowFrames=0; if(QLVL===1){ PQ=Math.min(PQ,0.6); } if(QLVL===0){ PQ=0.3; DPR=1; try{resize();}catch(e){} } } /* DÍA 21 · ANTI-CIERRE: reacciona en ~40 cuadros lentos (antes 90) para bajar la calidad ANTES de que el iPhone se caliente y cierre la página */
 }
 document.addEventListener('visibilitychange',function(){ if(document.hidden&&running&&!paused&&!quizOn){ togglePause(); } }); /* MANTENIMIENTO: si cambia de app, pausa solo */
 window.addEventListener('resize',resize);
@@ -1681,7 +1681,7 @@ function draw(dt){
     if(p.ring){ ctx.strokeStyle=p.c; ctx.lineWidth=4; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.stroke(); }
     else { ctx.fillStyle=p.c;
       /* ULTRA: brillo de estudio en las chispas redondas */
-      if(p.glow&&QLVL>0){ ctx.shadowColor=p.c; ctx.shadowBlur=12; } /* MANTENIMIENTO: sin brillo en modo liviano */
+      if(p.glow&&QLVL>1){ ctx.shadowColor=p.c; ctx.shadowBlur=12; } /* MANTENIMIENTO + DÍA 21 ANTI-CIERRE: el brillo (shadowBlur, lo más caro en iPhone) solo en calidad ALTA; en media las chispas se dibujan igual pero sin sombra, para que la página no se cierre en las buenas rachas */
       if(p.r){ ctx.beginPath(); ctx.arc(p.x,p.y,p.r*(0.6+0.4*p.life/pm),0,7); ctx.fill(); }
       else ctx.fillRect(p.x-2,p.y-2,4,4);
       ctx.shadowBlur=0; } }
