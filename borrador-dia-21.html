@@ -341,7 +341,7 @@ canvas{display:block}
 
 <!-- Modal misiones -->
 <div id="mMisiones" class="screen modal off">
-  <div class="mbox"><h2>📋 MISIONES</h2><div id="misList"></div><button class="btn" id="misClose">Cerrar</button></div>
+  <div class="mbox"><button class="backbtn" id="misBack" style="font-size:1.1rem;padding:12px 24px;background:rgba(255,255,255,.22);margin-bottom:10px">⬅ Volver</button><h2>📋 MISIONES</h2><div id="misList"></div><button class="btn" id="misClose">Cerrar</button></div>
 </div>
 <!-- Modal temporada -->
 <div id="mSeason" class="screen modal off">
@@ -349,11 +349,11 @@ canvas{display:block}
 </div>
 <!-- Modal logros -->
 <div id="mLogros" class="screen modal off">
-  <div class="mbox"><h2>🏆 LOGROS</h2><div id="achList"></div><button class="btn" id="achClose">Cerrar</button></div>
+  <div class="mbox"><button class="backbtn" id="achBack" style="font-size:1.1rem;padding:12px 24px;background:rgba(255,255,255,.22);margin-bottom:10px">⬅ Volver</button><h2>🏆 LOGROS</h2><div id="achList"></div><button class="btn" id="achClose">Cerrar</button></div>
 </div>
 <!-- Modal tienda -->
 <div id="mTienda" class="screen modal off">
-  <div class="mbox"><h2>🛒 TIENDA</h2>
+  <div class="mbox"><button class="backbtn" id="shopBack" style="font-size:1.1rem;padding:12px 24px;background:rgba(255,255,255,.22);margin-bottom:10px">⬅ Volver</button><h2>🛒 TIENDA</h2>
     <div class="pill" style="display:flex;gap:14px;justify-content:center;margin-bottom:6px;flex-wrap:wrap">
       <span>🪙 <b id="shopCoins">0</b></span><span>⭐ <b id="shopStars">0</b></span><span>🔑 <b id="shopKeys">0</b></span><span>💎 <b id="shopGems">0</b></span>
     </div>
@@ -559,12 +559,15 @@ $('btnSettingsTop').addEventListener('click',function(){ show('ajustes'); });
 $('advPanel').addEventListener('click',function(){ show('mundos'); });
 $('btnLogros').addEventListener('click',function(){ renderAch(); $('mLogros').classList.remove('off'); SFX.click(); });
 $('achClose').addEventListener('click',function(){ $('mLogros').classList.add('off'); SFX.click(); });
+$('achBack').addEventListener('click',function(){ $('mLogros').classList.add('off'); show('menu'); });
 $('btnMisiones').addEventListener('click',function(){ renderMis(); $('mMisiones').classList.remove('off'); SFX.click(); });
 $('misClose').addEventListener('click',function(){ $('mMisiones').classList.add('off'); SFX.click(); });
+$('misBack').addEventListener('click',function(){ $('mMisiones').classList.add('off'); show('menu'); });
 $('seasonBanner').addEventListener('click',function(){ renderSeason(); $('mSeason').classList.remove('off'); SFX.click(); });
 $('seasonClose').addEventListener('click',function(){ $('mSeason').classList.add('off'); SFX.click(); });
 $('btnTienda').addEventListener('click',function(){ renderShop(); $('mTienda').classList.remove('off'); SFX.click(); });
 $('shopClose').addEventListener('click',function(){ $('mTienda').classList.add('off'); SFX.click(); });
+$('shopBack').addEventListener('click',function(){ $('mTienda').classList.add('off'); show('menu'); });
 function buyBoard(i){
   var b=BOARDS[i], owned=state.boards.indexOf(b.key)>=0;
   if(owned){ state.boardSel=i; store('gbg_boardSel',String(i)); toast('🛹 ¡'+b.name+' lista para usar!'); SFX.click(); renderShop(); return; }
