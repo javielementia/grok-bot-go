@@ -489,7 +489,7 @@ var MISSIONS = [
   {id:'m4', txt:'Responde 3 preguntas bien (total)', target:3, prog:parseInt(read('gbg_qok','0'),10)||0, done:false, reward:3}
 ];
 /* ============ FASES (alcance autorizado por Javier) ============ */
-var PHASE4_ON=true; /* DIA 22 (2026-10-25): preguntas cerebro ACTIVADAS en borrador: cada 300 m el juego te pregunta (10 preguntas, 2 respuestas); aciertas y ganas +50 pts y +1 gema; la mision m4 y el logro Cerebrito ya se ven en sus paneles. Solo cambia esta constante: todo el sistema ya estaba hecho y esperando. */
+var PHASE4_ON=true; /* DIA 22 (2026-10-25) + CORRECCION DE JAVIER: preguntas cerebro ACTIVADAS, pero SOLO al terminar la partida (pidio que no entorpezcan la carrera); aciertas: +50 pts y +1 gema; mision m4 y logro Cerebrito visibles. RONDA 3 iPhone: DPR 1.0 y tope de particulas 180 en iOS. */
 var ACHS = [
   {id:'a1', txt:'Primera carrera', check:function(s){ return s.runs>=1; }},
   {id:'a2', txt:'Llega a 500 metros', check:function(s){ return s.maxDist>=500; }},
@@ -705,7 +705,7 @@ var W=0,H=0,DPR=1;
 function laneX(){ var m=W*0.18; lanePX=[m,W/2,W-m]; }
 var isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent||''); /* MANTENIMIENTO: iPhone se protege cerrando páginas pesadas */
 var QLVL=2, slowFrames=0; /* 2=alta 1=media 0=liviana */
-function resize(){ DPR=Math.min(isIOS?1.25:2,window.devicePixelRatio||1) /* RONDA 2: iOS a 1.25 = ~31% menos píxeles que llenar por cuadro */; W=Math.min(window.innerWidth,520); H=window.innerHeight; cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); laneX(); }
+function resize(){ DPR=Math.min(isIOS?1.0:2,window.devicePixelRatio||1) /* RONDA 2: iOS a 1.25 = ~31% menos píxeles que llenar por cuadro */; W=Math.min(window.innerWidth,520); H=window.innerHeight; cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); laneX(); }
 /* MANTENIMIENTO: si el teléfono va lento muchos cuadros seguidos, bajo la calidad solo para que no se cierre */
 function adaptQuality(dtms){
   if(dtms>26){ slowFrames++; } else if(slowFrames>0){ slowFrames--; }
@@ -715,7 +715,7 @@ document.addEventListener('visibilitychange',function(){ if(document.hidden&&run
 window.addEventListener('resize',resize);
 function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 /* ============ ESTADO DEL JUEGO ============ */
-var running=false,paused=false,quizOn=false;
+var running=false,paused=false,quizOn=false,quizAtEnd=false;
 var lane=1,lanePX=[0,0,0],px=0,py=0,jumpV=0,jumping=false,jumpY=0;
 var ents=[],parts=[],motes=[],midBushes=[],fgTufts=[];
 var score=0,dist=0,coins=0,starsRun=0,caught=0,lives=6,maxLives=6;
@@ -940,6 +940,7 @@ function finishGame(){
   if(!(isRecord&&score>0)) m+=' · Récord: '+state.best+' pts';
   $('fMsg').textContent=m;
   show('over');
+  if(PHASE4_ON){ setTimeout(function(){ if(!running&&!$('over').classList.contains('off')) startQuiz(true); },700); } /* DIA 22 - CORRECCION DE JAVIER: la pregunta sale al terminar la partida */
   if(isRecord&&score>0) SFX.record(); else SFX.no();
   vibrate(200);
 }
@@ -1068,7 +1069,7 @@ function newEnt(kind,lane,y){ var e=entFree.pop();
   else e={kind:kind,lane:lane,y:y,got:false,ph:Math.random()*6.28,ci:0,ch:null,li:-1,mx:undefined,mtg:0};
   return e; }
 function delEnt(i){ if(entFree.length<160) entFree.push(ents[i]); ents.splice(i,1); }
-function newPart(){ if(parts.length>(isIOS?260:380)) return null; /* RONDA 2: en iOS el tope baja a 260 */ var p=partFree.pop(); if(!p) p={}; return p; } /* MANTENIMIENTO: tope de partículas */
+function newPart(){ if(parts.length>(isIOS?180:380)) return null; /* RONDA 2: en iOS el tope baja a 260 */ var p=partFree.pop(); if(!p) p={}; return p; } /* MANTENIMIENTO: tope de partículas */
 function safeSetPart(x,y,vx,vy,life,max,c,r,a,ring,vr,glow){ var p=newPart(); if(!p) return; parts.push(setPart(p,x,y,vx,vy,life,max,c,r,a,ring,vr,glow)); }
 function setPart(p,x,y,vx,vy,life,max,c,r,a,ring,vr,glow){ p.x=x;p.y=y;p.vx=vx;p.vy=vy;p.life=life;p.max=max;p.c=c;p.r=r||0;p.a=(a===undefined?1:a);p.ring=!!ring;p.vr=vr||0;p.glow=!!glow; return p; }
 function delPart(j){ if(partFree.length<500) partFree.push(parts[j]); parts.splice(j,1); }
@@ -1089,8 +1090,8 @@ function updateHud(){
   var gw=$('gWordTx'); if(gw) gw.textContent=DW.done?'✅ ¡Completa!':('🔤 '+dwText()); }
 
 /* ============ QUIZ 🧠 ============ */
-function startQuiz(){
-  quizOn=true; qAnswered=false;
+function startQuiz(atEnd){
+  quizOn=true; quizAtEnd=!!atEnd; qAnswered=false;
   var qi; do{ qi=Math.floor(Math.random()*QUESTIONS.length); }while(qi===lastQ);
   lastQ=qi; var Q=QUESTIONS[qi];
   var flip=Math.random()<0.5, first=flip?1:0;
@@ -1107,6 +1108,7 @@ function answerQuiz(pick){
   var correctText=(qCorrect===0?bA:bB).textContent;
   if(pick===qCorrect){
     score+=50*permMult; state.gems+=1; store('gbg_gems',String(state.gems));
+    if(quizAtEnd){ lastScore=score; $('fScore').textContent=score; if(score>state.best){ state.best=score; store('gbg_best',String(state.best)); $('newRecord').classList.remove('hidden'); } }
     var ok=parseInt(read('gbg_qok','0'),10)||0; store('gbg_qok',String(ok+1));
     MISSIONS[3].prog=ok+1;
     (pick===0?bA:bB).className='qBtn ok';
@@ -1119,7 +1121,7 @@ function answerQuiz(pick){
     SFX.no();
   }
   checkMissions();
-  setTimeout(function(){ $('quiz').classList.add('off'); quizOn=false; nextQuiz+=300; lastTs=performance.now(); requestAnimationFrame(loop); },1600);
+  setTimeout(function(){ $('quiz').classList.add('off'); quizOn=false; if(quizAtEnd){ quizAtEnd=false; }else{ nextQuiz+=300; lastTs=performance.now(); requestAnimationFrame(loop); } },1600);
 }
 $('qA').addEventListener('click',function(){ answerQuiz(0); });
 $('qB').addEventListener('click',function(){ answerQuiz(1); });
@@ -1542,7 +1544,7 @@ function loop(ts){
     burst(px,py-30,'#ffd21f'); burst(px,py-30,'#ff9d2e'); SFX.level();
     state.gems+=1; store('gbg_gems',String(state.gems));
     showLvl('🎉 ¡Nivel '+lvl+'! +'+bonus+' pts · +1 💎'); updateHud(); }
-  if(PHASE4_ON && dist>=nextQuiz){ startQuiz(); }
+  /* DIA 22 - CORRECCION DE JAVIER (2026-10-25): sin preguntas en carrera; van al FINAL de la partida, pa' no entorpecer el juego. */
   spawnT-=dt;
   if(spawnT<=0){ spawn(); var gap=Math.max(34,78-curLvl*3); spawnT=gap*(0.7+Math.random()*0.6); }
   px+=(lanePX[lane]-px)*0.25*dt; py=H-150+jumpY+flyY;
