@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>BOTSITOS GO — Más que un juego, es una aventura</title>
+<!-- BORRADOR DIA 25 (2026-10-28): MUNDO NEVADO JUGABLE. NO PUBLICADO EN EL JUEGO DE VERDAD: espera el si explicito de Javier. Base: borrador-dia-24.html intacto (tienda arreglada + preguntas cerebro al final + aviso del festival + musica suave + arreglo iPhone intactos). Solo anade: el Mundo Nevado, que tenia candado y solo decia 'viene pronto', ya se puede jugar: se toca su tarjeta en Mundos y corre con nieve (cielo y camino de nieve, copos cayendo, mismas reglas, mismos puntos, monedas, corazones y dificultad del Mundo Verde). Sus estrellas se guardan aparte (gbg_nstars, max 30). Espacial y Ciudad siguen con candado y su aviso honesto. Sin cambios de diseno del mockup, sin tocar el juego de verdad. -->
+<!-- BORRADOR DIA 24 (2026-10-27): MUSICA DE FONDO SUAVE EN LA CARRERA. NO PUBLICADO EN EL JUEGO DE VERDAD: espera el si explicito de Javier. Base: borrador-dia-23.html intacto (tienda arreglada + preguntas cerebro al final + aviso del festival + arreglo iPhone intactos). Solo anade: una melodia suave en bucle SOLO mientras corres, sin archivos (reusa tone(), que ya desconecta cada nota, anti-cierre iPhone); volumen bajo para no tapar los efectos; se apaga sola al terminar la carrera o salir al menu; respeta el mismo interruptor de sonido de Ajustes (si silencias, no suena). Sin cambios de diseno, sin tocar puntos, monedas, corazones ni dificultad. -->
+<!-- BORRADOR DIA 23 (2026-10-26): AVISO DEL FESTIVAL ANTES DE QUE EMPIECE. NO PUBLICADO EN EL JUEGO DE VERDAD: espera el si explicito de Javier. Base: borrador-dia-22.html intacto (tienda arreglada + preguntas cerebro + arreglo iPhone intactos). Solo cambia el menu: el banner del Festival de Flores ya NO esta escondido hasta el 1 de noviembre; desde hoy avisa "Empieza en 6 dias, el 1 de noviembre" y al tocarlo dice que te prepares. Cuando empiece el festival, el banner vuelve solo a "Termina en X dias" con sus misiones. Sin cambios de diseno, sin personajes nuevos, sin tocar puntos, monedas ni dificultad. -->
+<!-- BORRADOR DIA 21 (2026-10-24): LA TIENDA PRIMERO (orden de Javier: "la tienda primero"). NO PUBLICADO: espera el si explicito de Javier. Base: borrador-dia-20.html intacto. SOLO la tienda cambia: (1) bono de bienvenida unico de +500 monedas la primera vez que se abre la tienda (guardado en gbg_welcome, no se repite); (2) cada fila se ve como boton: chip COMPRAR verde si alcanza, "Te faltan X" en gris si no; (3) pie honesto: fuera "La tienda esta completa", ahora "Toca COMPRAR para mejorar tu juego"; (4) canje real de gemas: 5 gemas por 300 monedas (exchangeGems). Sin cambios fuera de la tienda, sin cambios de diseno. -->
+<!-- BORRADOR DIA 20 (2026-10-24): EL PATITO TE SALUDA AL EMPEZAR. NO PUBLICADO: espera el si explicito de Javier. Base: borrador-dia-19.html (patito + vista de espaldas intactos). Solo anade: al terminar la intro, el patito da saltitos, aletea, muestra un corazoncito y sale '¡Vamos, amiguito! ¡A correr!'. Sin cambios de puntos, corazones ni dificultad. Sin cambios de diseno. -->
 <!-- BORRADOR DIA 5 (2026-10-12): Cuenta regresiva tranquila 3-2-1 al volver de la pausa y al revivir. NO PUBLICADO: espera el si explicito de Javier. Base: grok-bot-go-profesional.html (la version profesional aprobada y publicada el 2026-10-11). Sin cambios de diseno, sin personajes nuevos: solo pulido dentro del diseno del mockup. -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -107,7 +112,7 @@ h1.gtitle .w1{color:#38a8ed}h1.gtitle .w2{color:#ffb020}h1.gtitle .w3{color:#74b
     <button class="mbtn" id="btnMundos"><span class="e">📖</span> MUNDOS</button>
     <button class="mbtn" id="btnAjustes"><span class="e">⚙️</span> AJUSTES</button>
     <div id="menuChars"></div>
-    <div id="seasonBanner" class="hidden" style="width:100%;max-width:400px;background:linear-gradient(180deg,rgba(120,40,90,.85),rgba(80,20,60,.85));border:1px solid rgba(255,158,199,.6);border-radius:16px;padding:10px 14px;cursor:pointer;margin:6px 0;box-shadow:0 6px 20px rgba(0,0,0,.4);font-weight:800">🌸 <span id="seasonName">Festival</span><br><small style="font-weight:600">¡Termina en <b id="seasonDays">0</b> días! Toca para ver las misiones 🎁</small></div>
+    <div id="seasonBanner" class="hidden" style="width:100%;max-width:400px;background:linear-gradient(180deg,rgba(120,40,90,.85),rgba(80,20,60,.85));border:1px solid rgba(255,158,199,.6);border-radius:16px;padding:10px 14px;cursor:pointer;margin:6px 0;box-shadow:0 6px 20px rgba(0,0,0,.4);font-weight:800">🌸 <span id="seasonName">Festival</span><br><small style="font-weight:600"><span id="seasonBannerSub">¡Termina en <b id="seasonDays">0</b> días! Toca para ver las misiones 🎁</span></small></div>
     <div id="advPanel"><div style="text-align:left"><b>NUEVA AVENTURA</b><br><small>EL MUNDO TE ESPERA</small></div><div class="go">➤</div></div>
     <div class="iconrow">
       <button class="icobtn" id="btnLogros"><span class="e">🏆</span>LOGROS</button>
@@ -204,6 +209,8 @@ canvas{display:block}
 .mrow{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;margin:8px 0;text-align:left;font-size:.88rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .mrow small{color:#9fb3d9;display:block;font-size:.72rem}
 .mrow .done{color:#74bd42;font-weight:800}
+.buyBtn{background:#3fae4a;color:#fff;font-weight:800;padding:6px 14px;border-radius:999px;font-size:.8rem;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.buyBtn.off{background:rgba(255,255,255,.10);color:#8fa3c8;box-shadow:none}
 /* ===== TOAST / LOADER ===== */
 #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:60;background:rgba(8,16,42,.94);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:10px 24px;font-weight:700;font-size:.9rem;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 #loader{background:#0b1026;z-index:70}
@@ -337,7 +344,7 @@ canvas{display:block}
 
 <!-- Modal misiones -->
 <div id="mMisiones" class="screen modal off">
-  <div class="mbox"><h2>📋 MISIONES</h2><div id="misList"></div><button class="btn" id="misClose">Cerrar</button></div>
+  <div class="mbox"><button class="backbtn" id="misBack" style="font-size:1.1rem;padding:12px 24px;background:rgba(255,255,255,.22);margin-bottom:10px">⬅ Volver</button><h2>📋 MISIONES</h2><div id="misList"></div><button class="btn" id="misClose">Cerrar</button></div>
 </div>
 <!-- Modal temporada -->
 <div id="mSeason" class="screen modal off">
@@ -345,16 +352,16 @@ canvas{display:block}
 </div>
 <!-- Modal logros -->
 <div id="mLogros" class="screen modal off">
-  <div class="mbox"><h2>🏆 LOGROS</h2><div id="achList"></div><button class="btn" id="achClose">Cerrar</button></div>
+  <div class="mbox"><button class="backbtn" id="achBack" style="font-size:1.1rem;padding:12px 24px;background:rgba(255,255,255,.22);margin-bottom:10px">⬅ Volver</button><h2>🏆 LOGROS</h2><div id="achList"></div><button class="btn" id="achClose">Cerrar</button></div>
 </div>
 <!-- Modal tienda -->
 <div id="mTienda" class="screen modal off">
-  <div class="mbox"><h2>🛒 TIENDA</h2>
+  <div class="mbox"><button class="backbtn" id="shopBack" style="font-size:1.1rem;padding:12px 24px;background:rgba(255,255,255,.22);margin-bottom:10px">⬅ Volver</button><h2>🛒 TIENDA</h2>
     <div class="pill" style="display:flex;gap:14px;justify-content:center;margin-bottom:6px;flex-wrap:wrap">
       <span>🪙 <b id="shopCoins">0</b></span><span>⭐ <b id="shopStars">0</b></span><span>🔑 <b id="shopKeys">0</b></span><span>💎 <b id="shopGems">0</b></span>
     </div>
     <div id="shopList"></div>
-    <div class="scrSub" style="margin-top:8px">¡La tienda está completa! 🎉</div>
+    <div class="scrSub" style="margin-top:8px">Toca COMPRAR para mejorar tu juego 🛒</div>
     <button class="btn" id="shopClose">Cerrar</button>
   </div>
 </div>
@@ -417,7 +424,9 @@ function tone(f,d,type,vol){ if(state.muted) return; try{
   o.type=type||'triangle'; o.frequency.value=f;
   g.gain.setValueAtTime(vol||0.12, actx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+d);
-  o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);
+  o.connect(g); g.connect(actx.destination);
+  o.onended=function(){ try{ o.disconnect(); g.disconnect(); }catch(e){} }; /* RONDA 2 ANTI-CIERRE: sin esto, cada sonido dejaba 2 nodos conectados PARA SIEMPRE en el grafo de audio; a los ~90 s de buena partida se juntaban ~1,600 y Safari cerraba la página */
+  o.start(); o.stop(actx.currentTime+d);
 }catch(e){} }
 var SFX = {
   click:function(){ tone(600,.07,'triangle'); },
@@ -438,6 +447,14 @@ var SFX = {
   boardAct:function(){ var n=[523,659,784,1046]; n.forEach(function(f,i){ setTimeout(function(){ tone(f,.1,'triangle'); },i*60); }); },
   brk:function(){ tone(300,.18,'square',0.12); setTimeout(function(){ tone(180,.25,'square',0.1); },90); } /* tabla rota */
 };
+/* ============ MUSICA DE FONDO (DIA 24, sin archivos) ============ */
+/* Melodia suave en bucle, SOLO durante la carrera. Reusa tone(): cada nota se desconecta al terminar (anti-cierre iPhone, igual que los efectos). Volumen bajo (0.05) para no tapar los efectos. El tick revisa silencio/pausa/carrera en cada nota, asi que el interruptor de sonido de Ajustes y el boton de silencio la apagan y la prenden sin tocar nada mas. */
+var MUSIC={on:false,timer:null,step:0,
+ notes:[523,659,784,659,880,784,659,523,392,523,659,523,784,659,523,392],
+ start:function(){ if(this.on) return; this.on=true; this.step=0; try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==='suspended') actx.resume(); }catch(e){} var self=this; this.timer=setInterval(function(){ self.tick(); },280); },
+ stop:function(){ this.on=false; if(this.timer){ clearInterval(this.timer); this.timer=null; } },
+ tick:function(){ if(!this.on||state.muted||!running||paused) return; tone(this.notes[this.step%this.notes.length],.24,'triangle',0.05); this.step++; } };
+
 /* ============ ESTADO GLOBAL ============ */
 var state = {
   screen:'loader', muted: read('gbg_muted','0')==='1',
@@ -470,7 +487,7 @@ var CHARS = [
 /* ============ MUNDOS ============ */
 var WORLDS = [
   {key:'verde',   name:'Mundo Verde',   stars:state.worldStars, max:30, locked:false, bg:null},
-  {key:'nevado',  name:'Mundo Nevado',  stars:0, max:30, locked:true, bg:null},
+  {key:'nevado',  name:'Mundo Nevado',  stars:parseInt(read('gbg_nstars','0'),10)||0, max:30, locked:false, bg:null}, /* DIA 25: Nevado ya jugable */
   {key:'espacial',name:'Mundo Espacial',stars:0, max:30, locked:true, bg:null},
   {key:'ciudad',  name:'Mundo Ciudad',  stars:0, max:30, locked:true, bg:null}
 ];
@@ -482,7 +499,7 @@ var MISSIONS = [
   {id:'m4', txt:'Responde 3 preguntas bien (total)', target:3, prog:parseInt(read('gbg_qok','0'),10)||0, done:false, reward:3}
 ];
 /* ============ FASES (alcance autorizado por Javier) ============ */
-var PHASE4_ON=false; /* Fase 4 (preguntas cerebro) y Fase 5 (pulido final): Javier dirá cuándo activarlas */
+var PHASE4_ON=true; /* DIA 22 (2026-10-25) + CORRECCION DE JAVIER: preguntas cerebro ACTIVADAS, pero SOLO al terminar la partida (pidio que no entorpezcan la carrera); aciertas: +50 pts y +1 gema; mision m4 y logro Cerebrito visibles. RONDA 3 iPhone: DPR 1.0 y tope de particulas 180 en iOS. */
 var ACHS = [
   {id:'a1', txt:'Primera carrera', check:function(s){ return s.runs>=1; }},
   {id:'a2', txt:'Llega a 500 metros', check:function(s){ return s.maxDist>=500; }},
@@ -555,12 +572,15 @@ $('btnSettingsTop').addEventListener('click',function(){ show('ajustes'); });
 $('advPanel').addEventListener('click',function(){ show('mundos'); });
 $('btnLogros').addEventListener('click',function(){ renderAch(); $('mLogros').classList.remove('off'); SFX.click(); });
 $('achClose').addEventListener('click',function(){ $('mLogros').classList.add('off'); SFX.click(); });
+$('achBack').addEventListener('click',function(){ $('mLogros').classList.add('off'); show('menu'); });
 $('btnMisiones').addEventListener('click',function(){ renderMis(); $('mMisiones').classList.remove('off'); SFX.click(); });
 $('misClose').addEventListener('click',function(){ $('mMisiones').classList.add('off'); SFX.click(); });
-$('seasonBanner').addEventListener('click',function(){ renderSeason(); $('mSeason').classList.remove('off'); SFX.click(); });
+$('misBack').addEventListener('click',function(){ $('mMisiones').classList.add('off'); show('menu'); });
+$('seasonBanner').addEventListener('click',function(){ SFX.click(); if(SEASON){ renderSeason(); $('mSeason').classList.remove('off'); } else { var nx=nextSeason(); if(nx) toast(nx.emoji+' '+nx.name+' empieza en '+daysUntilSeason(nx)+' días. ¡Prepárate! 🎁'); } }); /* DIA 23: sin festival activo, el toque avisa en vez de abrir un modal vacío */
 $('seasonClose').addEventListener('click',function(){ $('mSeason').classList.add('off'); SFX.click(); });
 $('btnTienda').addEventListener('click',function(){ renderShop(); $('mTienda').classList.remove('off'); SFX.click(); });
 $('shopClose').addEventListener('click',function(){ $('mTienda').classList.add('off'); SFX.click(); });
+$('shopBack').addEventListener('click',function(){ $('mTienda').classList.add('off'); show('menu'); });
 function buyBoard(i){
   var b=BOARDS[i], owned=state.boards.indexOf(b.key)>=0;
   if(owned){ state.boardSel=i; store('gbg_boardSel',String(i)); toast('🛹 ¡'+b.name+' lista para usar!'); SFX.click(); renderShop(); return; }
@@ -571,6 +591,7 @@ function buyBoard(i){
   toast('🎉 ¡'+b.name+' comprada!'); SFX.level(); renderShop();
 }
 function renderShop(){
+  if(read('gbg_welcome','0')!=='1'){ store('gbg_welcome','1'); state.coins+=500; store('gbg_coins',String(state.coins)); toast('🎁 ¡Regalo de bienvenida! +500 🪙'); SFX.level(); }
   $('shopCoins').textContent=state.coins; $('shopStars').textContent=state.stars;
   $('shopKeys').textContent=state.keys; $('shopGems').textContent=state.gems;
   var w=$('shopList'); w.innerHTML='';
@@ -579,16 +600,18 @@ function renderShop(){
   h('🛹 TABLAS');
   BOARDS.forEach(function(b,i){
     var owned=state.boards.indexOf(b.key)>=0, sel=state.boardSel===i;
-    row('<div>🛹 '+b.name+'<small>'+b.desc+'</small></div><span>'+(owned?(sel?'✓ Lista':'Tocar'):'🪙 '+b.cost)+'</span>',function(){ buyBoard(i); });
+    row('<div>🛹 '+b.name+'<small>'+b.desc+'</small></div><span>'+(owned?(sel?'✓ Lista':'<span class="buyBtn">USAR</span>'):(state.coins>=b.cost?'<span class="buyBtn">COMPRAR · 🪙 '+b.cost+'</span>':'<span class="buyBtn off">Te faltan '+(b.cost-state.coins)+' 🪙</span>'))+'</span>',function(){ buyBoard(i); });
   });
   h('⬆️ MEJORAS · duran para siempre');
   Object.keys(UPG).forEach(function(k){
     var u=UPG[k], lv=upgLvl(k), maxed=lv>=5;
     var pips='●'.repeat(lv)+'○'.repeat(5-lv);
-    row('<div>'+u.name+'<small>'+pips+' · Dura '+upgSecs(k)+'s ('+u.secs+'/nivel)</small></div><span>'+(maxed?'🏆 MÁX':'🪙 '+upgCost(k))+'</span>',function(){ buyUpg(k); });
+    row('<div>'+u.name+'<small>'+pips+' · Dura '+upgSecs(k)+'s ('+u.secs+'/nivel)</small></div><span>'+(maxed?'🏆 MÁX':(state.coins>=upgCost(k)?'<span class="buyBtn">COMPRAR · 🪙 '+upgCost(k)+'</span>':'<span class="buyBtn off">Te faltan '+(upgCost(k)-state.coins)+' 🪙</span>'))+'</span>',function(){ buyUpg(k); });
   });
   h('🔑 LLAVES MÁGICAS');
-  row('<div>🔑 Llave mágica<small>Revive una vez al chocar</small></div><span>🪙 300</span>',function(){ buyKey(); });
+  row('<div>🔑 Llave mágica<small>Revive una vez al chocar</small></div><span>'+(state.coins>=300?'<span class="buyBtn">COMPRAR · 🪙 300</span>':'<span class="buyBtn off">Te faltan '+(300-state.coins)+' 🪙</span>')+'</span>',function(){ buyKey(); });
+  h('💎 CANJE DE GEMAS');
+  row('<div>💎 Cambia 5 gemas por 300 🪙<small>Tus gemas también valen</small></div><span>'+(state.gems>=5?'<span class="buyBtn">CANJEAR · 💎 5</span>':'<span class="buyBtn off">Te faltan '+(5-state.gems)+' 💎</span>')+'</span>',function(){ exchangeGems(); });
   h('👤 BOTSITOS');
   row('<div>👤 Desbloquea robots<small>Se compran en Personajes</small></div><span>▶ Ir</span>',function(){ $('mTienda').classList.add('off'); show('personajes'); SFX.click(); });
 }
@@ -598,6 +621,13 @@ function buyKey(){
   state.coins-=cost; store('gbg_coins',String(state.coins));
   state.keys+=1; store('gbg_keys',String(state.keys));
   toast('🎉 ¡Llave mágica comprada! 🔑'); SFX.level(); renderShop();
+}
+function exchangeGems(){
+  var cost=5, gain=300;
+  if(state.gems<cost){ toast('Te faltan 💎 '+(cost-state.gems)+' para el canje'); SFX.no(); return; }
+  state.gems-=cost; store('gbg_gems',String(state.gems));
+  state.coins+=gain; store('gbg_coins',String(state.coins));
+  toast('💎 ¡Canje hecho! +300 🪙'); SFX.level(); renderShop();
 }
 $('btnAmigos').addEventListener('click',function(){
   var msg='🤖 ¡Juega BOTSITOS GO! 🎮 Lo creé yo. Toca el link y juega, no pide cuenta ni contraseña. ¡Dime cuántos puntos haces! 🏆';
@@ -624,6 +654,7 @@ function renderWorlds(){
   WORLDS.forEach(function(wd){
     var d=document.createElement('div'); d.className='wcard'+(state.world===wd.key?' sel':'');
     var imgHtml = wd.key==='verde' && IMG.bg ? '<div class="wimg" style="background-image:url('+IMG.bg.src+')"></div>'
+      : wd.key==='nevado' ? '<div class="wimg" style="background:linear-gradient(160deg,#bfe3f7,#ffffff)"></div>'
       : '<div class="wimg locked" style="background:linear-gradient(160deg,#1c2a5e,#0d1430)"></div>';
     d.innerHTML=imgHtml+'<div class="wnm">'+wd.name+'</div><div class="wst">⭐ '+wd.stars+'/'+wd.max+'</div>';
     d.addEventListener('click',function(){
@@ -649,6 +680,7 @@ function renderMis(){
     d.innerHTML='<div>'+m.txt+'<small>Recompensa: '+m.reward+' ⭐ · Progreso: '+Math.min(m.prog,m.target)+'/'+m.target+'</small></div><span class="'+(m.done?'done':'')+'">'+(m.done?'✓':'○')+'</span>';
     w.appendChild(d);
   });
+  var note=document.createElement('div'); note.className='mrow'; note.innerHTML='<div><small>Las recompensas se cobran al terminar la carrera.</small></div><span></span>'; w.appendChild(note); /* DIA 25: aviso honesto de misiones */
 }
 function renderAch(){
   var w=$('achList'); w.innerHTML='';
@@ -685,20 +717,22 @@ var W=0,H=0,DPR=1;
 function laneX(){ var m=W*0.18; lanePX=[m,W/2,W-m]; }
 var isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent||''); /* MANTENIMIENTO: iPhone se protege cerrando páginas pesadas */
 var QLVL=2, slowFrames=0; /* 2=alta 1=media 0=liviana */
-function resize(){ DPR=Math.min(isIOS?1.5:2,window.devicePixelRatio||1); W=Math.min(window.innerWidth,520); H=window.innerHeight; cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); laneX(); }
+function resize(){ DPR=Math.min(isIOS?1.0:2,window.devicePixelRatio||1) /* RONDA 2: iOS a 1.25 = ~31% menos píxeles que llenar por cuadro */; W=Math.min(window.innerWidth,520); H=window.innerHeight; cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); laneX(); }
 /* MANTENIMIENTO: si el teléfono va lento muchos cuadros seguidos, bajo la calidad solo para que no se cierre */
 function adaptQuality(dtms){
   if(dtms>26){ slowFrames++; } else if(slowFrames>0){ slowFrames--; }
-  if(slowFrames>90&&QLVL>0){ QLVL--; slowFrames=0; if(QLVL===1){ PQ=Math.min(PQ,0.6); } if(QLVL===0){ PQ=0.3; DPR=1; try{resize();}catch(e){} } }
+  if(slowFrames>40&&QLVL>0){ QLVL--; slowFrames=0; if(QLVL===1){ PQ=Math.min(PQ,0.6); } if(QLVL===0){ PQ=0.3; DPR=1; try{resize();}catch(e){} } } /* DÍA 21 · ANTI-CIERRE: reacciona en ~40 cuadros lentos (antes 90) para bajar la calidad ANTES de que el iPhone se caliente y cierre la página */
 }
 document.addEventListener('visibilitychange',function(){ if(document.hidden&&running&&!paused&&!quizOn){ togglePause(); } }); /* MANTENIMIENTO: si cambia de app, pausa solo */
 window.addEventListener('resize',resize);
 function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 /* ============ ESTADO DEL JUEGO ============ */
-var running=false,paused=false,quizOn=false;
+var running=false,paused=false,quizOn=false,quizAtEnd=false;
 var lane=1,lanePX=[0,0,0],px=0,py=0,jumpV=0,jumping=false,jumpY=0;
 var ents=[],parts=[],motes=[],midBushes=[],fgTufts=[];
 var score=0,dist=0,coins=0,starsRun=0,caught=0,lives=6,maxLives=6;
+var nextCheer=500; /* DÍA 16: cada 500 m el juego te aplaude con confetis, como los grandes juegos */
+var duckNext=25,duckX=0,duckY=0,duckSadT=0,duckHopT=0,duckHopCd=0,duckHopN=0,duckLearned=false,duckHopDur=26,duckGreetT=0; /* DÍA 20: saludo del patito al empezar */ /* DÍA 19 (idea de Einstein, autorizada por Javier): «EL PATITO APRENDE» — cuenta los obstáculos que brinca y al 10 vuela */ /* DÍA 19: el patito también brinca solito los obstáculos que vienen en su carril */ /* DÍA 17: 🐥 EL PATITO AMIGUITO — como Roz cuidó al patito en Robot Salvaje, el botsito cuida a su amiguito: lo sigue, se alegra con las monedas y se preocupa si chocas */
 var speed=0,baseSpeed=3,spawnT=0,mult=1,multT=0,slowmo=1,hurt=0;
 var rolling=false,rollT=0,shield=false,curLvl=1,safeDist=180;
 var magT=0,jumpT=0,flyT=0,flyCoinT=0;
@@ -724,7 +758,9 @@ function sweep(f0,f1,d,type,vol){ if(state.muted) return; try{
   o.frequency.linearRampToValueAtTime(f1,actx.currentTime+d);
   g.gain.setValueAtTime(vol||0.12,actx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+d);
-  o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+d);
+  o.connect(g); g.connect(actx.destination);
+  o.onended=function(){ try{ o.disconnect(); g.disconnect(); }catch(e){} }; /* RONDA 2 ANTI-CIERRE: liberar los nodos al terminar, igual que en tone() */
+  o.start(); o.stop(actx.currentTime+d);
 }catch(e){} }
 /* ============ SECCIÓN 4 · ECONOMÍA Y PROGRESIÓN ============ */
 var permMult=parseInt(read('gbg_permMult','1'),10)||1; if(permMult<1)permMult=1; if(permMult>30)permMult=30;
@@ -834,11 +870,13 @@ function renderSeason(){
   var bg=[]; try{ bg=JSON.parse(read('gbg_badges','[]')); }catch(e){}
   $('seasonBadges').textContent=bg.length?('Tus insignias: '+bg.join(' ')):'Aún no tienes insignias… ¡completa misiones del festival! '+SEASON.emoji;
 }
+function nextSeason(){ var n=new Date(); for(var i=0;i<SEASONS.length;i++){ var f=new Date(SEASONS[i].from+'T00:00:00'); if(f>n) return SEASONS[i]; } return null; } /* DIA 23: primer festival que todavía no empezó */
+function daysUntilSeason(s){ return Math.max(0,Math.ceil((new Date(s.from+'T00:00:00')-new Date())/86400000)); } /* DIA 23: días que faltan para que empiece */
 function refreshSeasonBanner(){
   var b=$('seasonBanner'); if(!b) return;
-  if(SEASON){ b.classList.remove('hidden'); $('seasonDays').textContent=seasonDaysLeft(); $('seasonName').textContent=SEASON.emoji+' '+SEASON.name; }
-  else b.classList.add('hidden');
-}
+  if(SEASON){ b.classList.remove('hidden'); $('seasonDays').textContent=seasonDaysLeft(); $('seasonName').textContent=SEASON.emoji+' '+SEASON.name; var sub=$('seasonBannerSub'); if(sub) sub.innerHTML='¡Termina en <b id="seasonDays">0</b> días! Toca para ver las misiones 🎁'; $('seasonDays').textContent=seasonDaysLeft(); }
+  else{ var nx=nextSeason(); if(nx){ b.classList.remove('hidden'); $('seasonName').textContent=nx.emoji+' '+nx.name; var sub2=$('seasonBannerSub'); if(sub2) sub2.textContent='¡Empieza en '+daysUntilSeason(nx)+' días! El 1 de noviembre 🎁'; } else b.classList.add('hidden'); }
+} /* DIA 23: antes del festival el banner AVISA (no se esconde); al empezar, vuelve solo al texto activo */
 function initPetals(){ petals=[]; for(var i=0;i<14;i++) petals.push({x:Math.random()*W,y:Math.random()*H,vy:0.5+Math.random()*1.1,ph:Math.random()*6.28,sz:4+Math.random()*5}); }
 function maxHearts(){ return CHARS[state.char].key==='rosa'?7:6; }
 /* ============ PALABRA DEL DÍA 🔤 ============ */
@@ -873,8 +911,8 @@ function startGame(){
   maxLives=maxHearts(); lives=maxLives;
   GENIUS_TIME = ch.key==='amarillo'?720:480;
   shield=false; boardInv=ch.key==='verde'?1:0; /* SECCIÓN 3: verde empieza con 1 hoverboard en el bolsillo */
-  running=true;paused=false;quizOn=false;
-  score=0;dist=0;coins=0;starsRun=0;caught=0;
+  running=true;paused=false;quizOn=false; MUSIC.start(); /* DIA 24: la musica empieza con la carrera */
+  score=0;dist=0;coins=0;starsRun=0;caught=0;nextCheer=500;duckNext=25;duckX=0;duckY=0;duckSadT=0;duckHopT=0;duckHopCd=0;duckHopN=0;duckLearned=false;duckHopDur=26;duckGreetT=0; /* DÍA 20: el saludo empieza apagado en cada carrera */ /* DÍA 17: el patito empieza la carrera junto a ti */
   speed=0;baseSpeed=state.soft?3.0:3.8;safeDist=state.soft?180:120;
   ents=[];parts=[];lane=1;jumping=false;jumpY=0;rolling=false;rollT=0;
   popups=[];shakeT=0;pickFlash=0;ssx=ssy=1;ssTX=ssTY=1;leanA=0;landT=0;airFrames=0; /* JUICE 1: estado limpio */
@@ -894,12 +932,13 @@ function startGame(){
   lastTs=performance.now(); requestAnimationFrame(loop); SFX.click();
 }
 function finishGame(){
-  running=false;paused=false;quizOn=false;
+  running=false;paused=false;quizOn=false; MUSIC.stop(); /* DIA 24: la musica se apaga al terminar */
   $('gameHud').classList.add('hidden'); hideMissionBanner(); $('quiz').classList.add('off');
   var isRecord=score>state.best;
   if(isRecord){ state.best=score; store('gbg_best',String(state.best)); }
   state.xp+=Math.floor(dist/50); store('gbg_xp',String(state.xp));
-  state.worldStars=Math.min(30,state.worldStars+starsRun); store('gbg_wstars',String(state.worldStars)); WORLDS[0].stars=state.worldStars;
+  if(state.world==='nevado'){ var ns=Math.min(30,(parseInt(read('gbg_nstars','0'),10)||0)+starsRun); store('gbg_nstars',String(ns)); WORLDS[1].stars=ns; } /* DIA 25: estrellas del Nevado aparte */
+   else { state.worldStars=Math.min(30,state.worldStars+starsRun); store('gbg_wstars',String(state.worldStars)); WORLDS[0].stars=state.worldStars; }
   state.coins+=coins; store('gbg_coins',String(state.coins));
   MISSIONS[0].prog=Math.max(MISSIONS[0].prog,starsRun);
   MISSIONS[1].prog=Math.max(MISSIONS[1].prog,Math.floor(dist));
@@ -916,12 +955,13 @@ function finishGame(){
   if(!(isRecord&&score>0)) m+=' · Récord: '+state.best+' pts';
   $('fMsg').textContent=m;
   show('over');
+  if(PHASE4_ON){ setTimeout(function(){ if(!running&&!$('over').classList.contains('off')) startQuiz(true); },700); } /* DIA 22 - CORRECCION DE JAVIER: la pregunta sale al terminar la partida */
   if(isRecord&&score>0) SFX.record(); else SFX.no();
   vibrate(200);
 }
 $('againBtn').addEventListener('click',function(){ startGame(); });
 $('menuBtn').addEventListener('click',function(){ show('menu'); });
-$('quitBtn').addEventListener('click',function(){ running=false; $('gameHud').classList.add('hidden'); show('menu'); });
+$('quitBtn').addEventListener('click',function(){ running=false; MUSIC.stop(); /* DIA 24 */ $('gameHud').classList.add('hidden'); show('menu'); });
 $('introSkip').addEventListener('click',function(){ introOn=false; $('introChase').classList.add('off'); spawnT=30; nextQuiz=dist+300; SFX.click(); });
 /* ============ PAUSA ============ */
 function togglePause(){
@@ -1000,6 +1040,9 @@ function takeHit(ex,ey){
     if(boardDef().key==='estrella'){ var eb=50*permMult; score+=eb; popup(ex,ey-70,'+'+eb,'#ffd21f',true); }
     SFX.brk(); showLvl('🛹 ¡La tabla se rompió! ¡Tú estás bien! 💚'); slowmo=0.5; setTimeout(function(){slowmo=1;},900); updateHud(); vibrate(80); return false; }
   lives--; hurt=40; shakeT=6; /* JUICE 1: shake MUY sutil 2px · 0.1s al chocar */ burst(ex,ey,'#c9a06b'); SFX.hit(); vibrate(150); updateHud();
+  var lostPts=Math.min(10,Math.max(0,Math.floor(score))); score-=lostPts; /* DÍA 19: el obstáculo también te quita 10 puntos (nunca por debajo de 0), para que brincarlos valga más */
+  if(lostPts>0) popup(ex,ey-96,'💥 ¡Te quitó '+lostPts+' puntos!','#ff9d9d',true);
+  duckSadT=180; showLvl('💙 ¡Cuida a tu amiguito!'); /* DÍA 17: el patito se preocupa cuando pierdes un corazón (una sola vez por choque) */
   if(lives<=0){ offerRevive(); return true; }
   return false;
 }
@@ -1024,7 +1067,7 @@ function doReviveNo(){ reviveOpen=false; $('revive').classList.add('off'); finis
 $('reviveYes').addEventListener('click',doReviveYes);
 $('reviveNo').addEventListener('click',doReviveNo);
 var PQ=(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4)?0.5:1; /* ART: gama baja = mitad de partículas */
-function burst(x,y,c){ var n=Math.max(4,Math.round(10*PQ)); for(var i=0;i<n;i++) safeSetPart(x,y,(Math.random()-0.5)*6,(Math.random()-0.5)*6-2,30,30,c,0,1,0,0,true); } /* ULTRA: chispas con brillo */
+function burst(x,y,c){ var n=Math.max(4,Math.round(10*PQ*(isIOS?0.55:1))); /* RONDA 2 iOS: festejos (aplauso 500 m, nivel, patito) con ~mitad de chispas: el festejo se ve, el pico de costo no */ for(var i=0;i<n;i++) safeSetPart(x,y,(Math.random()-0.5)*6,(Math.random()-0.5)*6-2,30,30,c,0,1,0,0,true); } /* ULTRA: chispas con brillo */
 /* ---- JUICE PACK 1: polvo, estelas, popups flotantes, pulso y tween del HUD ---- */
 function dust(x,y){ var n=Math.max(3,Math.round(8*PQ)); for(var i=0;i<n;i++) safeSetPart(x+(Math.random()-0.5)*40,y-4,(Math.random()-0.5)*3.2,-0.4-Math.random()*1.4,16+Math.random()*10,26,'#d8cdb8',3+Math.random()*3,0.55); }
 function trail(x,y,c){ safeSetPart(x+(Math.random()-0.5)*8,y,(Math.random()-0.5)*1.4,1+Math.random()*1.6,22,22,c,4+Math.random()*3,0.5,0,0,true); } /* ULTRA: estela brillante */
@@ -1041,7 +1084,7 @@ function newEnt(kind,lane,y){ var e=entFree.pop();
   else e={kind:kind,lane:lane,y:y,got:false,ph:Math.random()*6.28,ci:0,ch:null,li:-1,mx:undefined,mtg:0};
   return e; }
 function delEnt(i){ if(entFree.length<160) entFree.push(ents[i]); ents.splice(i,1); }
-function newPart(){ if(parts.length>380) return null; var p=partFree.pop(); if(!p) p={}; return p; } /* MANTENIMIENTO: tope de partículas */
+function newPart(){ if(parts.length>(isIOS?180:380)) return null; /* RONDA 2: en iOS el tope baja a 260 */ var p=partFree.pop(); if(!p) p={}; return p; } /* MANTENIMIENTO: tope de partículas */
 function safeSetPart(x,y,vx,vy,life,max,c,r,a,ring,vr,glow){ var p=newPart(); if(!p) return; parts.push(setPart(p,x,y,vx,vy,life,max,c,r,a,ring,vr,glow)); }
 function setPart(p,x,y,vx,vy,life,max,c,r,a,ring,vr,glow){ p.x=x;p.y=y;p.vx=vx;p.vy=vy;p.life=life;p.max=max;p.c=c;p.r=r||0;p.a=(a===undefined?1:a);p.ring=!!ring;p.vr=vr||0;p.glow=!!glow; return p; }
 function delPart(j){ if(partFree.length<500) partFree.push(parts[j]); parts.splice(j,1); }
@@ -1062,8 +1105,8 @@ function updateHud(){
   var gw=$('gWordTx'); if(gw) gw.textContent=DW.done?'✅ ¡Completa!':('🔤 '+dwText()); }
 
 /* ============ QUIZ 🧠 ============ */
-function startQuiz(){
-  quizOn=true; qAnswered=false;
+function startQuiz(atEnd){
+  quizOn=true; quizAtEnd=!!atEnd; qAnswered=false;
   var qi; do{ qi=Math.floor(Math.random()*QUESTIONS.length); }while(qi===lastQ);
   lastQ=qi; var Q=QUESTIONS[qi];
   var flip=Math.random()<0.5, first=flip?1:0;
@@ -1080,6 +1123,7 @@ function answerQuiz(pick){
   var correctText=(qCorrect===0?bA:bB).textContent;
   if(pick===qCorrect){
     score+=50*permMult; state.gems+=1; store('gbg_gems',String(state.gems));
+    if(quizAtEnd){ lastScore=score; $('fScore').textContent=score; if(score>state.best){ state.best=score; store('gbg_best',String(state.best)); $('newRecord').classList.remove('hidden'); } }
     var ok=parseInt(read('gbg_qok','0'),10)||0; store('gbg_qok',String(ok+1));
     MISSIONS[3].prog=ok+1;
     (pick===0?bA:bB).className='qBtn ok';
@@ -1092,7 +1136,7 @@ function answerQuiz(pick){
     SFX.no();
   }
   checkMissions();
-  setTimeout(function(){ $('quiz').classList.add('off'); quizOn=false; nextQuiz+=300; lastTs=performance.now(); requestAnimationFrame(loop); },1600);
+  setTimeout(function(){ $('quiz').classList.add('off'); quizOn=false; if(quizAtEnd){ quizAtEnd=false; }else{ nextQuiz+=300; lastTs=performance.now(); requestAnimationFrame(loop); } },1600);
 }
 $('qA').addEventListener('click',function(){ answerQuiz(0); });
 $('qB').addEventListener('click',function(){ answerQuiz(1); });
@@ -1137,7 +1181,9 @@ function initDeco(){
 }
 function drawBackground(dt){
   var horizon=H*0.30,bg=IMG.bg;
-  if(bg&&bg.width){
+  var isSnow=state.world==='nevado'; /* DIA 25 */
+  if(isSnow){ var gS=ctx.createLinearGradient(0,0,0,H); gS.addColorStop(0,'#7ec3ee'); gS.addColorStop(0.55,'#cfe8f7'); gS.addColorStop(1,'#ffffff'); ctx.fillStyle=gS; ctx.fillRect(0,0,W,H); }
+  else if(bg&&bg.width){
     var bw=bg.width,bh=bg.height,sc=Math.max(W/bw,H/bh),dw=bw*sc,dh=bh*sc;
     bgScroll=(bgScroll+speed*0.12*dt)%dh;
     for(var k=-1;k<1;k++){
@@ -1160,8 +1206,8 @@ function drawBackground(dt){
     if(b.y>H+90){ b.y=-90; b.x=Math.random()*W; }
     var bx=b.x< W/2?b.x*0.28:W-(W-b.x)*0.28;
     var dp=Math.max(0,(horizon-b.y))/horizon*14; /* PILAR 1: lo lejano se dobla hacia abajo */
-    ctx.fillStyle='#1f7a38'; ctx.beginPath(); ctx.ellipse(bx,b.y+dp,b.r,b.r*0.72,0,0,7); ctx.fill();
-    ctx.fillStyle='#3fbf5a'; ctx.beginPath(); ctx.ellipse(bx-b.r*0.18,b.y+dp-b.r*0.22,b.r*0.62,b.r*0.45,0,0,7); ctx.fill();
+    ctx.fillStyle=isSnow?'#e6f2fa':'#1f7a38'; ctx.beginPath(); ctx.ellipse(bx,b.y+dp,b.r,b.r*0.72,0,0,7); ctx.fill();
+    ctx.fillStyle=isSnow?'#ffffff':'#3fbf5a'; ctx.beginPath(); ctx.ellipse(bx-b.r*0.18,b.y+dp-b.r*0.22,b.r*0.62,b.r*0.45,0,0,7); ctx.fill();
   }
   /* PILAR 1 — truco "mundo curvado": el camino converge y se dobla suave hacia abajo a lo lejos */
   var droop=14;
@@ -1172,18 +1218,19 @@ function drawBackground(dt){
     for(st=10;st>=0;st--){ t=st/10; ctx.lineTo(rX(xBr,xTr,t),rY(t)); }
     ctx.closePath(); }
   /* ART low-poly: bandas planas, audaces y saturadas */
-  ctx.fillStyle='#c08b4e'; roadPath(W*0.02,W*0.98,W*0.36,W*0.64); ctx.fill();
-  ctx.fillStyle='#dca964'; roadPath(W*0.06,W*0.94,W*0.385,W*0.615); ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=4; ctx.setLineDash([16,20]); ctx.lineDashOffset=-dashOff;
+  ctx.fillStyle=isSnow?'#8fa8bf':'#c08b4e'; roadPath(W*0.02,W*0.98,W*0.36,W*0.64); ctx.fill();
+  ctx.fillStyle=isSnow?'#e6f0f7':'#dca964'; roadPath(W*0.06,W*0.94,W*0.385,W*0.615); ctx.fill();
+  ctx.strokeStyle=isSnow?'rgba(70,120,160,0.5)':'rgba(255,255,255,0.4)'; ctx.lineWidth=4; ctx.setLineDash([16,20]); ctx.lineDashOffset=-dashOff;
   for(var k2=0;k2<2;k2++){ var xa=W*(0.06+0.235*(k2+1)),xb=W*(0.385+0.115*(k2+1));
     ctx.beginPath(); for(var st2=0;st2<=12;st2++){ var t3=st2/12, qx=rX(xa,xb,t3), qy=rY(t3); if(st2===0) ctx.moveTo(qx,qy); else ctx.lineTo(qx,qy); } ctx.stroke(); }
   ctx.setLineDash([]);
 }
 function drawForeground(dt){
   var i,m;
-  for(i=0;i<motes.length;i++){ m=motes[i]; m.y-=m.sp*dt; m.ph+=0.03*dt;
-    if(m.y<-10){ m.y=H+10; m.x=Math.random()*W; }
-    ctx.globalAlpha=0.25+0.35*Math.abs(Math.sin(m.ph)); ctx.fillStyle='#fff7cc';
+  var isSnowF=state.world==='nevado'; /* DIA 25: en el Nevado los copos caen */
+  for(i=0;i<motes.length;i++){ m=motes[i]; if(isSnowF){ m.y+=m.sp*2.2*dt; } else { m.y-=m.sp*dt; } m.ph+=0.03*dt;
+    if(isSnowF){ if(m.y>H+10){ m.y=-10; m.x=Math.random()*W; } } else if(m.y<-10){ m.y=H+10; m.x=Math.random()*W; }
+    ctx.globalAlpha=0.25+0.35*Math.abs(Math.sin(m.ph)); ctx.fillStyle=isSnowF?'#ffffff':'#fff7cc';
     ctx.beginPath(); ctx.arc(m.x+Math.sin(m.ph)*8,m.y,m.r,0,7); ctx.fill(); }
   ctx.globalAlpha=1;
   for(i=0;i<fgTufts.length;i++){ var t=fgTufts[i]; t.y+=speed*0.9*dt;
@@ -1191,7 +1238,7 @@ function drawForeground(dt){
     if(t.x>W*0.30&&t.x<W*0.70&&t.y<H-40) continue;
     ctx.save(); ctx.translate(t.x,t.y); ctx.scale(t.s,t.s);
     ctx.lineWidth=3; ctx.lineCap='round';
-    var cols=['#2f7a3d','#3f9c4f','#27632f'];
+    var cols=isSnowF?['#cfe8f7','#ffffff','#9fc9e8']:['#2f7a3d','#3f9c4f','#27632f'];
     for(var b=-2;b<=2;b++){ ctx.strokeStyle=cols[(b+5)%3]; ctx.beginPath(); ctx.moveTo(b*5,0);
       ctx.quadraticCurveTo(b*7,-14+Math.sin(t.ph+b)*3,b*9,-24-Math.abs(b)*2); ctx.stroke(); }
     ctx.restore(); }
@@ -1358,6 +1405,92 @@ function drawGuardian(){
   ctx.fillStyle='#fff'; ctx.font='bold 13px sans-serif'; ctx.textAlign='center';
   ctx.fillText('🌿 Guardián del Bosque',gx,gy+58*s);
 }
+function drawDuck(){ /* DÍA 17: 🐥 el patito amiguito, dibujado solo con formas básicas */
+  if(duckX===0&&duckY===0){ duckX=px; duckY=py+40; }
+  duckX+=(px-duckX)*0.14; /* sigue al jugador con un poquito de atraso, en su mismo carril */
+  duckY+=((py+40)-duckY)*0.18; /* va detrás del botsito; si el jugador salta, el patito lo sigue volando */
+  var now=performance.now();
+  var flap=jumping||duckY<py+30||duckHopT>0||duckGreetT>0; /* DÍA 20: el patito aletea de alegria mientras te saluda */ /* aletea cuando el jugador salta, cuando va por el aire o cuando brinca solito (DÍA 19) */
+  var bob=flap?Math.sin(now/70)*3:Math.sin(now/140+1)*1.8; /* saltito/balanceo tierno al correr */
+  var greetHop=duckGreetT>0?Math.abs(Math.sin(now/90))*9:0; /* DÍA 20: saltitos de alegria del saludo */
+  var dx=duckX, dy=duckY+bob-greetHop;
+  var hopOff=duckHopT>0?Math.sin((1-duckHopT/duckHopDur)*Math.PI)*(duckLearned?58:38):0; /* DÍA 19: arco del brinco del patito; si ya aprendió a volar, sube más alto */
+  if(duckSadT>0) dx+=Math.sin(now/50)*1.2; /* temblorcito cuando está preocupado */
+  shadow(dx,dy+3,13);
+  ctx.save(); ctx.translate(dx,dy-hopOff);
+  ctx.strokeStyle='#ff9d2e'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(-4,-1); ctx.lineTo(-4,3); ctx.moveTo(4,-1); ctx.lineTo(4,3); ctx.stroke(); /* patitas naranjas */
+  var wa=flap?Math.abs(Math.sin(now/(duckLearned?42:60)))*(duckLearned?9:5):0; /* «EL PATITO APRENDE»: aleteo más marcado y rápido cuando ya sabe volar */
+  ctx.fillStyle='#f5c81e';
+  ctx.beginPath(); ctx.ellipse(-13,-11-wa,6,4,-0.5,0,7); ctx.fill(); /* alita izquierda */
+  ctx.beginPath(); ctx.ellipse(13,-11-wa,6,4,0.5,0,7); ctx.fill(); /* alita derecha */
+  ctx.beginPath(); ctx.moveTo(-10,-14); ctx.lineTo(-16,-17); ctx.lineTo(-9,-18); ctx.closePath(); ctx.fill(); /* colita */
+  ctx.fillStyle='#ffd92e'; ctx.beginPath(); ctx.ellipse(0,-9,13,10,0,0,7); ctx.fill(); /* cuerpo amarillo */
+  ctx.beginPath(); ctx.arc(1,-22,8,0,7); ctx.fill(); /* cabeza */
+  ctx.strokeStyle='#f5c81e'; ctx.lineWidth=1.8; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(1,-29); ctx.quadraticCurveTo(-2,-33,2,-32); ctx.moveTo(1,-29); ctx.quadraticCurveTo(5,-33,7,-30); ctx.stroke(); /* DÍA 18: plumita vista por detras — el patito tambien mira hacia alfrente, sin pico de frente */
+  ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.beginPath(); ctx.ellipse(-2,-25,3,2,-0.4,0,7); ctx.fill(); /* DÍA 18: brillo en la parte de atras de la cabecita — sin ojitos hacia la camara */
+  if(duckSadT>0){ ctx.fillStyle='#7dd8ff'; ctx.beginPath(); ctx.ellipse(-8,-19,2,3.2,0,0,7); ctx.fill(); } /* lagrimita azul de preocupación, al ladito de la cabecita */
+  if(duckGreetT>0){ ctx.fillStyle='#ff5b7f'; ctx.font='bold 13px sans-serif'; ctx.textAlign='center'; ctx.fillText('💛',-10,-34-Math.abs(Math.sin(now/90))*3); } /* DÍA 20: corazoncito del saludo, encima del patito */
+  ctx.restore();
+}
+
+/* ============ DÍA 18: EL BOTSITO EN PARTIDA VA DE ESPALDAS ============
+   Regla de Javier (2026-10-23): al jugar, el botsito mira hacia alfrente
+   (hacia donde corre) y el jugador lo ve DE ESPALDAS. Sin cara ni ojitos
+   durante la carrera. Menu, portada y personajes siguen de frente (intactos). */
+var BACKPAL={
+  marron:{m:'#8a4a26',d:'#65331a',l:'#b06a38'},
+  rosa:{m:'#f2aec2',d:'#dd8aa5',l:'#f9d2de'},
+  azul:{m:'#18a6f2',d:'#0d84cc',l:'#5cc0f6'},
+  verde:{m:'#8fca4e',d:'#68a534',l:'#abde77'},
+  amarillo:{m:'#f2c62c',d:'#d29e14',l:'#f8dc5e'}
+}; /* colores muestreados de los sprites originales de cada botsito */
+function drawPlayerBack(key,h){
+  var P=BACKPAL[key]||BACKPAL.marron;
+  var t=performance.now()/95; /* ritmo de la corrida */
+  var step=jumping?0:Math.sin(t), step2=jumping?0:Math.sin(t+Math.PI);
+  var liftL=jumping?3:Math.max(0,step)*3.2, liftR=jumping?3:Math.max(0,step2)*3.2;
+  var sw=jumping?0.25:step*0.35; /* los bracitos se balancean al contrario de las piernas */
+  /* piernitas cortitas corriendo (vistas por detras) */
+  ctx.fillStyle=P.d;
+  ctx.beginPath(); ctx.ellipse(-h*0.10,-h*0.035-liftL,h*0.075,h*0.05,0,0,7); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( h*0.10,-h*0.035-liftR,h*0.075,h*0.05,0,0,7); ctx.fill();
+  /* bracitos con balanceo de corredor */
+  ctx.strokeStyle=P.m; ctx.lineCap='round'; ctx.lineWidth=h*0.085;
+  ctx.beginPath(); ctx.moveTo(-h*0.20,-h*0.40); ctx.lineTo(-h*0.27,-h*0.24+sw*h*0.07); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo( h*0.20,-h*0.40); ctx.lineTo( h*0.27,-h*0.24-sw*h*0.07); ctx.stroke();
+  ctx.fillStyle=P.d;
+  ctx.beginPath(); ctx.arc(-h*0.27,-h*0.24+sw*h*0.07,h*0.048,0,7); ctx.fill(); /* manita izq */
+  ctx.beginPath(); ctx.arc( h*0.27,-h*0.24-sw*h*0.07,h*0.048,0,7); ctx.fill(); /* manita der */
+  /* cuerpo regordete visto por detras, con degradado de luz */
+  var bg=ctx.createLinearGradient(0,-h*0.50,0,-h*0.08);
+  bg.addColorStop(0,P.l); bg.addColorStop(0.45,P.m); bg.addColorStop(1,P.d);
+  ctx.fillStyle=bg; ctx.beginPath(); ctx.ellipse(0,-h*0.29,h*0.205,h*0.185,0,0,7); ctx.fill();
+  /* placa de la espalda con tornillitos y lucecita (su "mochilita") */
+  ctx.fillStyle=P.d; rr(-h*0.125,-h*0.435,h*0.25,h*0.27,h*0.07); ctx.fill();
+  ctx.fillStyle=P.m; rr(-h*0.105,-h*0.415,h*0.21,h*0.23,h*0.055); ctx.fill();
+  ctx.fillStyle=P.l;
+  [[-0.075,-0.385],[0.075,-0.385],[-0.075,-0.235],[0.075,-0.235]].forEach(function(pt){ ctx.beginPath(); ctx.arc(pt[0]*h,pt[1]*h,h*0.016,0,7); ctx.fill(); });
+  ctx.fillStyle='rgba(255,255,255,0.8)'; ctx.beginPath(); ctx.arc(0,-h*0.31,h*0.028,0,7); ctx.fill(); /* lucecita de la espalda */
+  /* cabecita redonda por detras: SIN cara ni ojitos, mirando hacia alfrente */
+  var hg=ctx.createRadialGradient(-h*0.08,-h*0.72,h*0.05,0,-h*0.63,h*0.32);
+  hg.addColorStop(0,P.l); hg.addColorStop(0.55,P.m); hg.addColorStop(1,P.d);
+  ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(0,-h*0.63,h*0.295,0,7); ctx.fill();
+  /* discos laterales (las orejitas del botsito) */
+  ctx.fillStyle=P.d;
+  ctx.beginPath(); ctx.ellipse(-h*0.295,-h*0.63,h*0.05,h*0.075,0,0,7); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( h*0.295,-h*0.63,h*0.05,h*0.075,0,0,7); ctx.fill();
+  ctx.fillStyle=P.m;
+  ctx.beginPath(); ctx.ellipse(-h*0.295,-h*0.63,h*0.028,h*0.045,0,0,7); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( h*0.295,-h*0.63,h*0.028,h*0.045,0,0,7); ctx.fill();
+  /* costura suave en la parte de atras de la cabeza */
+  ctx.strokeStyle='rgba(0,0,0,0.18)'; ctx.lineWidth=Math.max(1.5,h*0.02);
+  ctx.beginPath(); ctx.arc(0,-h*0.63,h*0.235,Math.PI*1.15,Math.PI*1.85); ctx.stroke();
+  /* antena con bolita, igual que su frente pero vista por detras */
+  ctx.strokeStyle=P.d; ctx.lineWidth=h*0.028;
+  ctx.beginPath(); ctx.moveTo(0,-h*0.915); ctx.lineTo(0,-h*0.955); ctx.stroke();
+  ctx.fillStyle=P.m; ctx.beginPath(); ctx.arc(0,-h*0.965,h*0.042,0,7); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.beginPath(); ctx.arc(-h*0.014,-h*0.978,h*0.014,0,7); ctx.fill();
+}
 function drawPlayer(x,y){
   var ch=CHARS[state.char],h=86;
   shadow(x,y+2,24);
@@ -1367,7 +1500,7 @@ function drawPlayer(x,y){
   var bob=jumping?0:Math.sin(performance.now()/130)*2.5; ctx.translate(0,bob);
   if(rolling) ctx.scale(1.18,0.60); else ctx.scale(ssx,ssy); /* JUICE 1: squash & stretch */
   if(hurt>0&&Math.floor(hurt/4)%2===0) ctx.globalAlpha=0.45;
-  drawSprite(ch.key,0,0,rolling?h*0.9:h);
+  drawPlayerBack(ch.key,rolling?h*0.9:h); /* DÍA 18: en partida se ve de espaldas */
   if(pickFlash>0){ ctx.globalAlpha=0.32*Math.min(1,pickFlash/4); ctx.fillStyle='#ffffff'; ctx.beginPath(); ctx.ellipse(0,-h/2,26,h/2,0,0,7); ctx.fill(); } /* JUICE 1: flash blanco 0.067s */
   ctx.restore(); ctx.globalAlpha=1;
   if(jumpT>0){ /* SECCIÓN 3: las zapatillas crecen con brillo */
@@ -1397,13 +1530,15 @@ function loop(ts){
       if(se.kind==='starMagic'){ se.y+=speed*dt*2.4; se.ph+=0.15*dt;
         if(se.y>=py-70){ delEnt(ii); score+=50; burst(px,py-40,'#ffd21f'); burst(px,py-40,'#fff'); popup(px,py-110,'+50','#ffd21f'); pickFlash=4; SFX.star(); showLvl('🌟 ¡Estrella mágica! +50'); } } }
     if(!introMsgDone&&introT>110){ introMsgDone=true; showLvl('🌿 ¡El Guardián del Bosque quiere jugar! ¡Corre!'); SFX.level(); }
-    if(introT>=230){ introOn=false; $('introChase').classList.add('off'); spawnT=30; nextQuiz=dist+300; }
+    if(introT>=230){ introOn=false; $('introChase').classList.add('off'); spawnT=30; nextQuiz=dist+300; duckGreetT=150; burst(duckX,duckY-10,'#ffd21f'); burst(duckX,duckY-10,'#fff3a0'); showLvl('🐥 ¡Vamos, amiguito! ¡A correr!'); SFX.level(); } /* DÍA 20: el patito te saluda al empezar la carrera */
     if(hurt>0) hurt-=dt;
     draw(dt); updateHud(); requestAnimationFrame(loop); return;
   }
   baseSpeed=Math.min(10,(state.soft?3.0:3.8)+dist/500);
   speed=baseSpeed*slowmo;
   dist+=speed*dt*0.045; dashOff+=speed*dt*1.0;
+  /* DÍA 16: cada 500 metros el juego te aplaude con confetis, como los grandes juegos */
+  if(dist>=nextCheer){ showLvl('🎉 ¡'+nextCheer+' metros! ¡Vas volando! 🚀'); SFX.level(); burst(px,py-60,'#ffd21f'); burst(px,py-60,'#ff6b8a'); burst(px,py-60,'#7dd8ff'); nextCheer+=500; }
   if(multT>0){ multT-=dt; if(multT<=0){ mult=1; showLvl('×2 terminado'); } }
   if(magT>0){ magT-=dt; if(magT<=0) showLvl('🧲 Imán terminado'); }
   if(jumpT>0){ jumpT-=dt; if(jumpT<=0) showLvl('👟 Zapatillas terminadas'); }
@@ -1427,7 +1562,7 @@ function loop(ts){
     burst(px,py-30,'#ffd21f'); burst(px,py-30,'#ff9d2e'); SFX.level();
     state.gems+=1; store('gbg_gems',String(state.gems));
     showLvl('🎉 ¡Nivel '+lvl+'! +'+bonus+' pts · +1 💎'); updateHud(); }
-  if(PHASE4_ON && dist>=nextQuiz){ startQuiz(); }
+  /* DIA 22 - CORRECCION DE JAVIER (2026-10-25): sin preguntas en carrera; van al FINAL de la partida, pa' no entorpecer el juego. */
   spawnT-=dt;
   if(spawnT<=0){ spawn(); var gap=Math.max(34,78-curLvl*3); spawnT=gap*(0.7+Math.random()*0.6); }
   px+=(lanePX[lane]-px)*0.25*dt; py=H-150+jumpY+flyY;
@@ -1443,6 +1578,17 @@ function loop(ts){
   if(rolling){ rollT-=dt; if(rollT<=0) rolling=false; }
   if(hurt>0) hurt-=dt;
   if(invT>0) invT-=dt;
+  if(duckSadT>0) duckSadT-=dt; /* DÍA 17: al patito se le pasa la preocupación poco a poco */
+  if(duckHopT>0) duckHopT-=dt; if(duckHopCd>0) duckHopCd-=dt; if(duckGreetT>0) duckGreetT-=dt; /* DÍA 20: el saludo dura un ratito y se apaga solo */ /* DÍA 19: tiempos del brinco del patito */
+  if(duckHopT<=0&&duckSadT<=0&&flyT<=0){ /* DÍA 19: el patito brinca SOLITO los obstáculos que vienen en su carril (más dinámica) */
+    for(var di=0;di<ents.length;di++){ var de=ents[di]; if(de.got) continue;
+      if(de.kind==='rock'||de.kind==='log'||de.kind==='bush'||de.kind==='vine'){
+        var dex=(de.mx!==undefined?de.mx:lanePX[de.lane]);
+        if(Math.abs(dex-duckX)<44&&de.y<duckY-8&&de.y>duckY-100){ duckHopN++; /* «EL PATITO APRENDE»: cada obstáculo brincado cuenta */
+          if(duckHopN>=10&&!duckLearned){ duckLearned=true; duckHopDur=34; duckHopT=34; burst(duckX,duckY-4,'#ffd21f'); burst(duckX,duckY-4,'#ffe27a'); burst(duckX,duckY-4,'#ffffff'); showLvl('🐥 ¡El patito aprendió a volar!'); }
+          else { duckHopDur=duckLearned?34:26; duckHopT=duckHopDur; if(duckLearned){ burst(duckX,duckY-4,'#ffd21f'); burst(duckX,duckY-4,'#ffe27a'); } else { burst(duckX,duckY-4,'#fff3a0'); burst(duckX,duckY-4,'#ffffff'); }
+            if(duckHopCd<=0){ duckHopCd=600; showLvl('🐥 ¡El patito brincó!'); } } break; } } }
+  }
   var magnet = CHARS[state.char].key==='azul'||magT>0;
   for(var i=ents.length-1;i>=0;i--){
     var e=ents[i]; e.y+=speed*dt*1.0; e.ph+=0.1*dt;
@@ -1457,7 +1603,7 @@ function loop(ts){
       var isHaz=(e.kind==='rock'||e.kind==='log'||e.kind==='bush'||e.kind==='vine');
       if(isHaz&&(invT>0||flyT>0)){ /* invencible: atraviesa sin daño */ }
       else if(e.kind==='bot'){ e.got=true; score+=10*effMult(); caught++; burst(ex,ey,'#fff'); popup(ex,ey-46,'+10','#ffffff'); pickFlash=4; tone(620+Math.min(caught,10)*30,.09,'triangle'); delEnt(i); }
-      else if(e.kind==='coin'){ e.got=true; var cpts=5*effMult(); score+=cpts; var cgain=(SEASON&&SEASON.coinBonus>1)?2:1; coins+=cgain; seasProg('coins',cgain); burst(ex,ey,'#ffe27a'); burst(ex,ey,'#ffffff'); popup(ex,ey-46,'+'+cpts,'#ffe27a'); pickFlash=4; pulseHud('gCoins'); coinStreak++; coinStreakT=0; SFX.coinStreak(); delEnt(i); }
+      else if(e.kind==='coin'){ e.got=true; var cpts=5*effMult(); score+=cpts; var cgain=(SEASON&&SEASON.coinBonus>1)?2:1; coins+=cgain; seasProg('coins',cgain); burst(ex,ey,'#ffe27a'); burst(ex,ey,'#ffffff'); popup(ex,ey-46,'+'+cpts,'#ffe27a'); pickFlash=4; pulseHud('gCoins'); coinStreak++; coinStreakT=0; SFX.coinStreak(); if(coins>=duckNext){ duckNext+=25; score+=20; popup(px,py-120,'+20','#ffe27a'); showLvl('🐥 ¡Tu amiguito está feliz! +20'); SFX.level(); } delEnt(i); } /* DÍA 17: el patito se alegra cada 25 monedas; el próximo festejo pide 25 monedas más (enfriamiento) */
       else if(e.kind==='star'){ e.got=true; score+=25*effMult(); starsRun++; state.stars+=1; store('gbg_stars',String(state.stars)); burst(ex,ey,'#ffd21f'); burst(ex,ey,'#fff'); popup(ex,ey-46,'+'+(25*effMult()),'#ffd21f'); pickFlash=4; pulseHud('gStars'); SFX.star(); delEnt(i); }
       else if(e.kind==='starMagic'){ e.got=true; score+=50*permMult; burst(ex,ey,'#ffd21f'); burst(ex,ey,'#fff'); popup(ex,ey-46,'+50','#ffd21f'); pickFlash=4; pulseHud('gStars'); SFX.star(); showLvl('🌟 ¡Estrella mágica! +50'); delEnt(i); }
       else if(e.kind==='key'){ e.got=true; state.keys+=1; store('gbg_keys',String(state.keys)); score+=10*effMult(); burst(ex,ey,'#ffd21f'); popup(ex,ey-46,'+'+(10*effMult()),'#ffe27a'); pickFlash=4; pulseHud('gKeys'); SFX.coin(); showLvl('🔑 ¡Llave conseguida!'); delEnt(i); }
@@ -1560,7 +1706,7 @@ function draw(dt){
     if(p.ring){ ctx.strokeStyle=p.c; ctx.lineWidth=4; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.stroke(); }
     else { ctx.fillStyle=p.c;
       /* ULTRA: brillo de estudio en las chispas redondas */
-      if(p.glow&&QLVL>0){ ctx.shadowColor=p.c; ctx.shadowBlur=12; } /* MANTENIMIENTO: sin brillo en modo liviano */
+      if(p.glow&&QLVL>1&&!isIOS){ ctx.shadowColor=p.c; ctx.shadowBlur=12; } /* RONDA 2: en iOS el brillo va APAGADO SIEMPRE (no solo al bajar calidad): shadowBlur es la operación más cara de Safari y en las buenas rachas se dibujaban decenas por cuadro */ /* MANTENIMIENTO + DÍA 21 ANTI-CIERRE: el brillo (shadowBlur, lo más caro en iPhone) solo en calidad ALTA; en media las chispas se dibujan igual pero sin sombra, para que la página no se cierre en las buenas rachas */
       if(p.r){ ctx.beginPath(); ctx.arc(p.x,p.y,p.r*(0.6+0.4*p.life/pm),0,7); ctx.fill(); }
       else ctx.fillRect(p.x-2,p.y-2,4,4);
       ctx.shadowBlur=0; } }
@@ -1578,6 +1724,7 @@ function draw(dt){
     ctx.font='bold 46px sans-serif'; ctx.textAlign='center'; ctx.lineWidth=8; ctx.strokeStyle='rgba(120,60,0,.85)';
     ctx.strokeText('¡×2!',0,0); ctx.fillStyle='#ffd21f'; ctx.fillText('¡×2!',0,0); ctx.restore(); ctx.globalAlpha=1; }
   if(introOn) drawGuardian();
+  drawDuck(); /* DÍA 17: primero el patito, detrás del botsito */
   if(!(hurt>0&&Math.floor(hurt/4)%2===0)) drawPlayer(px,py);
   if(flyT>0){ var fl2=Math.sin(performance.now()/150)*6; drawSprite('pFly',px+46,py-100+fl2,46); }
   /* SECCIÓN 3: onda de pulso magnético visible que se expande */
