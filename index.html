@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>BOTSITOS GO — Más que un juego, es una aventura</title>
+<!-- BORRADOR DIA 26 (2026-10-29): UNA SOLA CADENA DE JUEGO, SIN DOBLES, PA' QUE EL IPHONE NO SE CAIGA AL REVIVIR. NO PUBLICADO EN EL JUEGO DE VERDAD: espera el si explicito de Javier. Base: borrador-dia-25.html intacto (tienda arreglada + preguntas cerebro al final + aviso del festival + musica suave + Mundo Nevado + arreglo iPhone intactos). Solo cambia el bucle: (1) nuevo startLoop() con bandera loopOn, que NUNCA arranca una segunda cadena de dibujo; (2) al perder el ultimo corazon el juego ya no muere y renace la cadena: el panel de revivir congela el mundo y la misma cadena sigue; (3) los 4 arranques (empezar, volver de pausa, revivir, pregunta) pasan por startLoop(). Sin cambios de diseno, sin tocar puntos, monedas, corazones ni dificultad. -->
 <!-- BORRADOR DIA 25 (2026-10-28): MUNDO NEVADO JUGABLE. NO PUBLICADO EN EL JUEGO DE VERDAD: espera el si explicito de Javier. Base: borrador-dia-24.html intacto (tienda arreglada + preguntas cerebro al final + aviso del festival + musica suave + arreglo iPhone intactos). Solo anade: el Mundo Nevado, que tenia candado y solo decia 'viene pronto', ya se puede jugar: se toca su tarjeta en Mundos y corre con nieve (cielo y camino de nieve, copos cayendo, mismas reglas, mismos puntos, monedas, corazones y dificultad del Mundo Verde). Sus estrellas se guardan aparte (gbg_nstars, max 30). Espacial y Ciudad siguen con candado y su aviso honesto. Sin cambios de diseno del mockup, sin tocar el juego de verdad. -->
 <!-- BORRADOR DIA 24 (2026-10-27): MUSICA DE FONDO SUAVE EN LA CARRERA. NO PUBLICADO EN EL JUEGO DE VERDAD: espera el si explicito de Javier. Base: borrador-dia-23.html intacto (tienda arreglada + preguntas cerebro al final + aviso del festival + arreglo iPhone intactos). Solo anade: una melodia suave en bucle SOLO mientras corres, sin archivos (reusa tone(), que ya desconecta cada nota, anti-cierre iPhone); volumen bajo para no tapar los efectos; se apaga sola al terminar la carrera o salir al menu; respeta el mismo interruptor de sonido de Ajustes (si silencias, no suena). Sin cambios de diseno, sin tocar puntos, monedas, corazones ni dificultad. -->
 <!-- BORRADOR DIA 23 (2026-10-26): AVISO DEL FESTIVAL ANTES DE QUE EMPIECE. NO PUBLICADO EN EL JUEGO DE VERDAD: espera el si explicito de Javier. Base: borrador-dia-22.html intacto (tienda arreglada + preguntas cerebro + arreglo iPhone intactos). Solo cambia el menu: el banner del Festival de Flores ya NO esta escondido hasta el 1 de noviembre; desde hoy avisa "Empieza en 6 dias, el 1 de noviembre" y al tocarlo dice que te prepares. Cuando empiece el festival, el banner vuelve solo a "Termina en X dias" con sus misiones. Sin cambios de diseno, sin personajes nuevos, sin tocar puntos, monedas ni dificultad. -->
@@ -728,6 +729,9 @@ window.addEventListener('resize',resize);
 function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 /* ============ ESTADO DEL JUEGO ============ */
 var running=false,paused=false,quizOn=false,quizAtEnd=false;
+/* DIA 26: una sola cadena de juego — startLoop() nunca arranca una segunda cadena, pa' que el iPhone no dibuje doble al revivir */
+var loopOn=false;
+function startLoop(){ if(loopOn) return; loopOn=true; lastTs=performance.now(); requestAnimationFrame(loop); }
 var lane=1,lanePX=[0,0,0],px=0,py=0,jumpV=0,jumping=false,jumpY=0;
 var ents=[],parts=[],motes=[],midBushes=[],fgTufts=[];
 var score=0,dist=0,coins=0,starsRun=0,caught=0,lives=6,maxLives=6;
@@ -929,7 +933,7 @@ function startGame(){
   initDeco(); updateHud(); $('gHint').style.opacity='0.9';
   setTimeout(function(){ $('gHint').style.opacity='0'; },6000);
   sessionStats.runs++;
-  lastTs=performance.now(); requestAnimationFrame(loop); SFX.click();
+  startLoop(); SFX.click();
 }
 function finishGame(){
   running=false;paused=false;quizOn=false; MUSIC.stop(); /* DIA 24: la musica se apaga al terminar */
@@ -968,7 +972,7 @@ function togglePause(){
   if(!running||quizOn||reviveOpen||counting) return;
   paused=!paused;
   if(paused){ $('paused').classList.remove('off'); SFX.click(); }
-  else{ $('paused').classList.add('off'); SFX.click(); runCountdown(function(){ paused=false; lastTs=performance.now(); requestAnimationFrame(loop); }); }
+  else{ $('paused').classList.add('off'); SFX.click(); runCountdown(function(){ paused=false; startLoop(); }); }
 }
 /* ===== BORRADOR DIA 5 · CUENTA REGRESIVA TRANQUILA =====
    El juego queda CONGELADO mientras cuenta (el bucle no corre):
@@ -1056,12 +1060,13 @@ function offerRevive(){
   SFX.no(); vibrate(200);
 }
 function doReviveYes(){
+  if(counting) return; /* DIA 26: un solo revivir por cuenta 3-2-1, sin segunda cadena */
   if(state.keys<=0){ toast('No tienes llaves... ¡recoge 🔑 en el juego!'); SFX.no(); return; }
   state.keys--; store('gbg_keys',String(state.keys));
   lives=maxLives; invT=150; hurt=30; shield=false; reviveOpen=false;
   $('revive').classList.add('off');
   showLvl('💚 ¡De vuelta al juego!'); SFX.level(); updateHud();
-  runCountdown(function(){ lastTs=performance.now(); requestAnimationFrame(loop); }); /* DIA 5: vuelve tranquilo, sin arranque de golpe */
+  runCountdown(function(){ startLoop(); }); /* DIA 26: la cadena nunca murio (panel congela el mundo), solo se reanuda; DIA 5: vuelve tranquilo, sin arranque de golpe */
 }
 function doReviveNo(){ reviveOpen=false; $('revive').classList.add('off'); finishGame(); }
 $('reviveYes').addEventListener('click',doReviveYes);
@@ -1136,7 +1141,7 @@ function answerQuiz(pick){
     SFX.no();
   }
   checkMissions();
-  setTimeout(function(){ $('quiz').classList.add('off'); quizOn=false; if(quizAtEnd){ quizAtEnd=false; }else{ nextQuiz+=300; lastTs=performance.now(); requestAnimationFrame(loop); } },1600);
+  setTimeout(function(){ $('quiz').classList.add('off'); quizOn=false; if(quizAtEnd){ quizAtEnd=false; }else{ nextQuiz+=300; startLoop(); } },1600);
 }
 $('qA').addEventListener('click',function(){ answerQuiz(0); });
 $('qB').addEventListener('click',function(){ answerQuiz(1); });
@@ -1518,8 +1523,9 @@ function drawPlayer(x,y){
 }
 /* ============ BUCLE PRINCIPAL ============ */
 function loop(ts){
-  if(!running||paused) return;
+  if(!running||paused){ loopOn=false; return; }
   if(quizOn){ draw(0); requestAnimationFrame(loop); return; }
+  if(reviveOpen){ draw(0); requestAnimationFrame(loop); return; } /* DIA 26: el panel de revivir congela el mundo sin matar la cadena */
   var rawMs=Math.min(100,ts-lastTs); adaptQuality(rawMs); var dt=Math.min(50,rawMs)/16.7; lastTs=ts;
   if(introOn){
     introT+=dt;
@@ -1616,8 +1622,8 @@ function loop(ts){
       else if(e.kind==='letter'){ e.got=true; DW.got[e.li]=true; dwSave(); score+=30*effMult(); burst(ex,ey,'#a78bfa'); popup(ex,ey-46,'+'+(30*effMult()),'#a78bfa'); pickFlash=4; SFX.star(); var allL=true; for(var li2=0;li2<DW.w.length;li2++) if(!DW.got[li2]) allL=false;
         if(allL&&!DW.done){ DW.done=true; dwSave(); state.gems+=5; store('gbg_gems',String(state.gems)); score+=500*permMult; showLvl('🔤 ¡Palabra "'+DW.w+'" completa! +5 💎'); SFX.record(); } else { showLvl('🔤 Letra '+e.ch+' · '+dwText()); }
         delEnt(i); updateHud(); }
-      else if(e.kind==='log'||e.kind==='vine'){ if(!rolling){ e.got=true; delEnt(i); if(takeHit(ex,ey)) return; } }
-      else if(e.kind==='rock'||e.kind==='bush'){ if(!(jumping&&jumpY<-40)){ e.got=true; delEnt(i); if(takeHit(ex,ey)) return; } }
+      else if(e.kind==='log'||e.kind==='vine'){ if(!rolling){ e.got=true; delEnt(i); if(takeHit(ex,ey)) break; } } /* DIA 26: break, no return, pa' que la cadena siga viva y el panel la congele */
+      else if(e.kind==='rock'||e.kind==='bush'){ if(!(jumping&&jumpY<-40)){ e.got=true; delEnt(i); if(takeHit(ex,ey)) break; } } /* DIA 26: break, no return, pa' que la cadena siga viva y el panel la congele */
     }
   }
   for(var j=parts.length-1;j>=0;j--){ var p=parts[j]; p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=0.25*dt; if(p.ring) p.r+=p.vr*dt; p.life-=dt; if(p.life<=0) delPart(j); }
